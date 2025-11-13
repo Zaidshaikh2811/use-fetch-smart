@@ -34,8 +34,6 @@ Stop managing cache manually.
 
 # 🎥 Demo (GIFs)
 
-Add these GIFs for maximum impact (just upload in GitHub Issues → copy link):
-
 | Feature                        | GIF                  |
 | ------------------------------ | -------------------- |
 | 🔄 Auto fetch + loading state  | `demo-loading.gif`   |
