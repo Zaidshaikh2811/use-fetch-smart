@@ -1,6 +1,6 @@
 {
   "name": "use-fetch-smart",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A smart Axios wrapper with caching, retry, and React hook support.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -22,13 +22,13 @@
     "typescript"
   ],
   "repository": {
-  "type": "git",
-  "url": "https://github.com/zaid/use-fetch-smart.git"
-},
-"homepage": "https://github.com/zaid/use-fetch-smart",
-"bugs": {
-  "url": "https://github.com/zaid/use-fetch-smart/issues"
-},
+    "type": "git",
+    "url": "https://github.com/zaid/use-fetch-smart.git"
+  },
+  "homepage": "https://github.com/zaid/use-fetch-smart",
+  "bugs": {
+    "url": "https://github.com/zaid/use-fetch-smart/issues"
+  },
   "readme": "README.npm.md",
   "author": "Zaid Shaikh",
   "license": "MIT",
