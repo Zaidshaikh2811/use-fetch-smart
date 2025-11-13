@@ -9,7 +9,6 @@ This project follows [Semantic Versioning](https://semver.org/).
 ### Added
 - Added `useGetSmart` hook with cacheTimeMs TTL caching.
 - Added support for auto-token refresh via `refreshTokenFn`.
-- Added `FetchSmartProvider` for global configuration.
 - Added `FetchSmartDevtools` for debugging cache + requests.
 
 ### Improved
