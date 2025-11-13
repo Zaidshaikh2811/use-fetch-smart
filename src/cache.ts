@@ -1,10 +1,9 @@
-
 interface CacheItem<T> {
     data: T;
     expiry: number | null;
 }
 
-const memoryCache = new Map<string, CacheItem<any>>();
+export const memoryCache = new Map<string, CacheItem<any>>();
 
 export const cache = {
     set<T>(key: string, data: T, ttlSeconds?: number, persist?: boolean) {
@@ -40,4 +39,17 @@ export const cache = {
         memoryCache.set(key, parsed);
         return parsed.data;
     },
+
+    /** 🔥 Add these two! */
+    _keys() {
+        return Array.from(memoryCache.keys());
+    },
+
+    _dump() {
+        return Array.from(memoryCache.entries()).map(([key, val]) => ({
+            key,
+            data: val.data,
+            expiry: val.expiry,
+        }));
+    }
 };

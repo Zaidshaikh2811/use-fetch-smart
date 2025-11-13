@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { cache } from "./cache";
+import { cache, memoryCache } from "./cache";
 
 export const FetchSmartDevtools = () => {
     const [open, setOpen] = useState(false);
@@ -24,7 +24,7 @@ export const FetchSmartDevtools = () => {
                 width: 350,
                 maxHeight: "70vh",
                 overflow: "auto",
-                background: "white",
+                background: "black",
                 padding: 12,
                 borderRadius: 8,
                 boxShadow: "0 0 14px rgba(0,0,0,0.3)",
@@ -40,6 +40,5 @@ export const FetchSmartDevtools = () => {
         </div>
     );
 };
-
-const cacheKeys = () => Array.from((cache as any).memoryCache?.keys?.() || []);
-const cacheDump = () => (cache as any).memoryCache || {};
+const cacheKeys = () => cache._keys();
+const cacheDump = () => cache._dump();

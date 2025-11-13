@@ -5,6 +5,18 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+### Added
+- README: Provider setup example showing `refreshToken` + `retryLimit` and `FetchSmartDevtools` usage.
+
+### Fixed
+- Clarified exports and utilities (exports for axios helper and token utilities). Note: `package.json` still shows `1.0.3`; consider running `npm version patch` to align package version with changelog.
+
+### Improved
+- Small stability and documentation fixes across `smartAxios`, cache handling, and devtools.
+
+---
+
 ## [1.0.4] - 2025-11-14
 ### Added
 - Exported `axiosInstance` helper and `setGlobalToken` for advanced usage.
