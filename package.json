@@ -21,6 +21,15 @@
     "retry",
     "typescript"
   ],
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/zaid/use-fetch-smart.git"
+},
+"homepage": "https://github.com/zaid/use-fetch-smart",
+"bugs": {
+  "url": "https://github.com/zaid/use-fetch-smart/issues"
+},
+  "readme": "README.npm.md",
   "author": "Zaid Shaikh",
   "license": "MIT",
   "peerDependencies": {
