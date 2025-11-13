@@ -5,7 +5,24 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [1.0.3] - 2025-11-15
+## [1.0.4] - 2025-11-14
+### Added
+- Exported `axiosInstance` helper and `setGlobalToken` for advanced usage.
+- `smartAxios` now supports a `refreshTokenFn` for automatic 401 token refresh and request replay.
+- `FetchSmartProvider` accepts `retryLimit` and `refreshToken` in its config; `useFetchSmartContext` exposes the library axios instance.
+
+### Fixed
+- Cache TTL and persistence edge-cases (expiry checks and memory/localStorage synchronization).
+- Devtools read logic hardened to avoid errors when internal cache structures differ.
+
+### Improved
+- Retry/backoff logic refinements and stability improvements in interceptors.
+- Hook stability: reduce unnecessary re-renders and improve error handling.
+- Documentation updates (README examples for provider + devtools).
+
+---
+
+## [1.0.3] - 2025-11-13
 ### Added
 - Added `useGetSmart` hook with cacheTimeMs TTL caching.
 - Added support for auto-token refresh via `refreshTokenFn`.
@@ -21,7 +38,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [1.0.2] - 2025-11-14
+## [1.0.2] - 2025-11-13
 ### Added
 - Added `usePostSmart`, `usePutSmart`, `useDeleteSmart`.
 

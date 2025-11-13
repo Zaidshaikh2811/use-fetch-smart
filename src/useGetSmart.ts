@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 
 import { cache } from "./cache";
-import { createSmartAxios } from "./smartAxios";
+
+import { useFetchSmartContext } from "./FetchSmartProvider";
+
 
 export function useGetSmart<T = any>(
     url: string,
     opts?: {
-        baseURL?: string;
-        refreshTokenFn?: () => Promise<string | null>;
         cacheTimeMs?: number;
     }
 ) {
-    const api = createSmartAxios(opts?.baseURL || "", opts?.refreshTokenFn);
+    const { axiosInstance: api } = useFetchSmartContext();
 
 
-    const cacheKey = (opts?.baseURL || "") + url;
+    const cacheKey = url;
 
 
     const ttlSeconds = (opts?.cacheTimeMs || 5 * 60 * 1000) / 1000;
@@ -30,7 +30,7 @@ export function useGetSmart<T = any>(
         try {
             const res = await api.get<T>(url);
             setData(res.data);
-            cache.set(cacheKey, res.data, ttlSeconds, false);
+            cache.set(cacheKey, res.data, ttlSeconds);
         } catch (err) {
             setError(err);
         } finally {

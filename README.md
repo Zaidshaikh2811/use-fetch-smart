@@ -45,9 +45,6 @@ Add these GIFs for maximum impact (just upload in GitHub Issues → copy link):
 | 🎛 Devtools panel              | `demo-devtools.gif`  |
 | ✏️ Mutations (POST/PUT/DELETE) | `demo-mutations.gif` |
 
-Placeholders are ready in the README.
-Just upload your GIFs and replace.
-
 ---
 
 # 📦 Installation
@@ -56,6 +53,39 @@ Just upload your GIFs and replace.
 npm install use-fetch-smart
 # or
 yarn add use-fetch-smart
+```
+
+---
+
+# 🔧 Provider Setup
+
+Wrap your app with `FetchSmartProvider` to provide a configured axios instance and optional token refresh handling.
+
+```tsx
+import { FetchSmartProvider, FetchSmartDevtools } from "use-fetch-smart";
+
+const refreshToken = async () => {
+  // your refresh logic here — return new token string or null
+  return await fetch("/auth/refresh").then(r => r.json()).then(x => x.token).catch(() => null);
+};
+
+<FetchSmartProvider
+  config={{
+    baseURL: "https://api.example.com",
+    token: "initial-token",
+    refreshToken, // automatically called on 401
+    retryLimit: 3,
+  }}
+>
+  <App />
+  <FetchSmartDevtools />
+</FetchSmartProvider>
+```
+
+You can also import the lower-level utilities for advanced use:
+
+```ts
+import { axiosInstance, cacheManager, setGlobalToken } from "use-fetch-smart";
 ```
 
 ---
@@ -230,6 +260,6 @@ MIT © 2025
 
 ### Give it a star on GitHub — it helps A LOT ❤️
 
-👉 [https://github.com/YOUR_USERNAME/use-fetch-smart](https://github.com/zaidshaikh2811/use-fetch-smart)
+👉 [https://github.com/zaidshaikh2811/use-fetch-smart](https://github.com/zaidshaikh2811/use-fetch-smart)
 
 ---

@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { createSmartAxios } from "./smartAxios";
+import { useFetchSmartContext } from "./FetchSmartProvider";
 
 
 export function usePutSmart<T = any, Body = any>(
     url: string,
-    opts?: { baseURL?: string; refreshTokenFn?: () => Promise<string | null> }
 ) {
-    const api = createSmartAxios(opts?.baseURL || "", opts?.refreshTokenFn);
-
+    const { axiosInstance: api } = useFetchSmartContext();
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
