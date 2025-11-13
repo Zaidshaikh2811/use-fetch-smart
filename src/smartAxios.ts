@@ -18,10 +18,13 @@ export const createSmartAxios = (
     // 🔹 Attach token
     api.interceptors.request.use((config) => {
         if (globalToken) {
-            config.headers = {
-                ...config.headers,
-                Authorization: `Bearer ${globalToken}`,
-            };
+            config.headers = config.headers || {};
+            // Use headers.set when available
+            if (typeof config.headers.set === "function") {
+                config.headers.set("Authorization", `Bearer ${globalToken}`);
+            } else {
+                (config.headers as any)["Authorization"] = `Bearer ${globalToken}`;
+            }
         }
         return config;
     });
