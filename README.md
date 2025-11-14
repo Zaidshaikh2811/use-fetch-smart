@@ -230,6 +230,48 @@ Because it solves **real-world** problems every dev faces:
 It's small, clean, and does a LOT.
 
 ---
+ # 📚 Examples
+
+Real-world examples are included to help you understand and use the library instantly — no guessing, no confusion.
+
+### 🚀 **React Basic Example**
+A minimal React setup showing:
+- `FetchSmartProvider` configuration  
+- GET requests using `useGetSmart`  
+- Mutations (POST / PUT / DELETE)  
+- Refetching + loading states  
+
+📂 **Path:** [`examples/react-basic`](./examples/react-basic)
+
+---
+
+### 🖥️ **Backend Example (Express)**
+A tiny backend to test real API calls with:
+- GET `/users`
+- POST `/users`
+- PUT `/users/:id`
+- DELETE `/users/:id`
+
+Perfect for local testing and understanding request flow.
+
+📂 **Path:** [`examples/backend`](./examples/backend)
+
+---
+
+### 🧪 **Try the Examples**
+
+```bash
+# React example
+cd examples/react-basic
+npm install
+npm start
+
+# Backend example
+cd examples/backend
+npm install
+npm run dev
+
+```
 
 # 📁 Folder Structure
 
