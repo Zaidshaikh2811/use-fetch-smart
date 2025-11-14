@@ -241,7 +241,7 @@ A minimal React setup showing:
 - Mutations (POST / PUT / DELETE)  
 - Refetching + loading states  
 
-📂 **Path:** [`examples/react-basic`](./examples/react-basic)
+📂 **Path:** [`examples/react-basic`](./examples/frontend)
 
 ---
 
