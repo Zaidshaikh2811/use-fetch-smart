@@ -32,12 +32,6 @@
 </p>
 
 ### A smart React data-fetching library with **caching**, **retry logic**, **TTL**, **auto token refresh**, and simple **mutation hooks**.
-
-[![npm version](https://img.shields.io/npm/v/use-fetch-smart.svg)](https://www.npmjs.com/package/use-fetch-smart)
-[![npm downloads](https://img.shields.io/npm/dm/use-fetch-smart.svg)]()
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/zaidshaikh2811/use-fetch-smart)
-[![license](https://img.shields.io/npm/l/use-fetch-smart.svg)]()
-
 ---
 
 # ✨ Why use-fetch-smart?
