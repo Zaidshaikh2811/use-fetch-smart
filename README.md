@@ -1,8 +1,8 @@
 ## 🚀 use-fetch-smart
 
-A smart React data-fetching library with caching, TTL, retries, token auto-refresh, and simple mutation hooks — designed to remove repetitive boilerplate and make fetch-based code reliable and easy to maintain.
+A smart React data-fetching library with caching, TTL, retries, token auto-refresh, and simple mutation hooks — designed to reduce boilerplate and make fetch-based code reliable and easy to maintain.
 
-[![npm version](https://img.shields.io/npm/v/use-fetch-smart.svg)](https://www.npmjs.com/package/use-fetch-smart) [![npm downloads](https://img.shields.io/npm/dm/use-fetch-smart.svg)]() [![license](https://img.shields.io/npm/l/use-fetch-smart.svg)]()
+[![npm version](https://img.shields.io/npm/v/use-fetch-smart.svg)](https://www.npmjs.com/package/use-fetch-smart) [![license](https://img.shields.io/npm/l/use-fetch-smart.svg)]()
 
 ---
 
@@ -29,14 +29,13 @@ yarn add use-fetch-smart
 
 ## Quick Start
 
-Wrap your app with the `FetchSmartProvider` and provide a `refreshToken` function to enable automatic token refresh.
+Wrap your app with the `FetchSmartProvider` and provide a `refreshToken` function to enable automatic token refresh. Note: `FetchSmartDevtools` is intended for development use only — it is automatically gated out in production builds.
 
 ```tsx
 import React from 'react';
 import { FetchSmartProvider, FetchSmartDevtools } from 'use-fetch-smart';
 
 const refreshToken = async () => {
-  // return new token string or null
   const res = await fetch('/auth/refresh');
   if (!res.ok) return null;
   const json = await res.json();
@@ -47,6 +46,7 @@ export default function AppRoot() {
   return (
     <FetchSmartProvider config={{ baseURL: 'http://localhost:4000', retryLimit: 3, refreshToken }}>
       <App />
+      {/* Devtools will render only in non-production builds */}
       <FetchSmartDevtools />
     </FetchSmartProvider>
   );
@@ -57,40 +57,36 @@ export default function AppRoot() {
 
 ## Core Hooks
 
-- `useGetSmart<T>(url, { cacheTimeMs?, persist? })` — returns `{ data, loading, error, refetch }`.
+- `useGetSmart<T>(url, { cacheTimeMs?, persist?, swr? })` — returns `{ data, loading, error, refetch }`. Supports optional SWR-style background revalidation when `swr: true`.
 - `usePostSmart<T, B>(url)` — returns `{ mutate, data, loading, error }`.
 - `usePutSmart<T, B>(url)` — same shape as POST.
 - `useDeleteSmart<T>(url)` — returns `{ mutate, data, loading, error }`.
 
-Examples are shown in the `examples/` folder — see `examples/README.md`.
+Examples are available in the `examples/` folder — see `examples/README.md`.
 
 ---
 
 ## Cache & Persistence
 
-The library exposes a layered cache:
+The library uses a layered cache internally:
 
-- `memoryCache` — extremely fast in-memory reads (default).
-- `indexedDBCache` — persistent storage via `idb-keyval` (optional per-entry via `persist: true`).
-- `cacheDriver` — unified API used internally and available for advanced use.
+- `memoryCache` — in-memory store for fast reads.
+- `indexedDBCache` — persistent storage via `idb-keyval` (used when `persist: true` is set on an entry).
+- `cacheDriver` — internal unified API used by the hooks to read/write caches. (Advanced users can inspect `src/cache` files.)
 
-Use `cacheTimeMs` (TTL in ms) and `persist` to control storage and lifetime. The driver falls back to memory if IndexedDB is unavailable.
+Use `cacheTimeMs` (TTL in ms) and `persist` to control storage and lifetime. If IndexedDB is unavailable the driver falls back to memory.
 
 Example:
 
 ```tsx
-useGetSmart('/settings', { cacheTimeMs: 10 * 60_000, persist: true });
+useGetSmart('/settings', { cacheTimeMs: 10 * 60_000, persist: true, swr: true });
 ```
 
 ---
 
 ## Devtools
 
-Add `<FetchSmartDevtools />` inside the provider in development to inspect:
-
-- Cached keys & values
-- TTL remaining
-- Request history and retry attempts
+`<FetchSmartDevtools />` helps inspect cached keys & values, TTLs, and the combined view of memory + IndexedDB. It is safe to include in your app during development; the component intentionally does not render in production builds.
 
 ---
 
@@ -122,7 +118,7 @@ npm run dev
 
 - Tune `cacheTimeMs` per endpoint: short TTLs for frequently changing lists, longer TTLs for stable data.
 - Use `persist: true` only when you need persistence across sessions (e.g., user preferences).
-- After mutations, call `refetch()` on relevant queries or use `cacheManager.clear(key)` to invalidate.
+- After mutations, call `refetch()` on relevant queries or clear entries from the cache by inspecting `src/cache` utilities.
 - Keep `retryLimit` low for mutation endpoints to avoid duplicate side effects; prefer server idempotency.
 
 Security:
@@ -133,13 +129,12 @@ Security:
 ## API Reference (short)
 
 - `FetchSmartProvider(config: { baseURL, token?, retryLimit?, refreshToken? })`
-- `useGetSmart<T>(url, { cacheTimeMs?, persist? })`
+- `useGetSmart<T>(url, { cacheTimeMs?, persist?, swr? })`
 - `usePostSmart<T, B>(url)`
 - `usePutSmart<T, B>(url)`
 - `useDeleteSmart<T>(url)`
-- `FetchSmartDevtools()`
-- `cacheManager` — programmatic cache operations
-- `setGlobalToken(token)` — set token globally
+- `FetchSmartDevtools()` — development-only UI (gated in production)
+- `setGlobalToken(token)` — set token globally (via exported helper)
 
 ---
 

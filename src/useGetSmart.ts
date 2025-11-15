@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { cache } from "./cache/cache";
 import { useFetchSmartContext } from "./FetchSmartProvider";
 import { cacheDriver } from "./cache/cacheDriver";
 
@@ -17,11 +16,10 @@ export function useGetSmart<T = any>(
     const cacheKey = url;
 
     const ttlMs = opts?.cacheTimeMs ?? 0;
-    console.log("TTlms:", ttlMs);
 
 
     // Read from cache ONCE during mount
-    const [data, setData] = useState<T | null>(() => cache.get<T>(cacheKey));
+    const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(!data);
     const [error, setError] = useState<any>(null);
     const swr = opts?.swr ?? false;

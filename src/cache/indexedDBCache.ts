@@ -1,4 +1,4 @@
-import { get, set, del } from "idb-keyval";
+import { get, set, del, keys } from "idb-keyval";
 
 export interface CacheItem<T> {
     data: T;
@@ -33,5 +33,49 @@ export const indexedDBCache = {
         try {
             await del(key);
         } catch { }
+    },
+
+
+    async keys(): Promise<string[]> {
+        try {
+            return await keys();
+        } catch (err) {
+            const _proc: any = (globalThis as any).process;
+            if (_proc && _proc.env && _proc.env.NODE_ENV !== 'production') {
+                // log only in non-production builds
+                // @ts-ignore
+                console.error("IndexedDB keys error", err);
+            }
+            return [];
+        }
+    },
+
+    /** ⭐ REQUIRED BY DEVTOOLS: dump all items */
+    async dump(): Promise<any[]> {
+        try {
+            const allKeys = await keys();
+            const output: any[] = [];
+
+            for (const k of allKeys) {
+                const item = (await get(k)) as CacheItem<any>;
+                if (!item) continue;
+
+                output.push({
+                    key: k,
+                    data: item.data,
+                    expiry: item.expiry,
+                });
+            }
+
+            return output;
+        } catch (err) {
+            const _proc: any = (globalThis as any).process;
+            if (_proc && _proc.env && _proc.env.NODE_ENV !== 'production') {
+                // log only in non-production builds
+                // @ts-ignore
+                console.error("IndexedDB dump error", err);
+            }
+            return [];
+        }
     }
 };

@@ -40,5 +40,6 @@ export const cacheDriver = {
     async clear() {
         memoryCache.clear();
         // IndexedDB clear intentionally not implemented globally
-    }
+    },
+
 };

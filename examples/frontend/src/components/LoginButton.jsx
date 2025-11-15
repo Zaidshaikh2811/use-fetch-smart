@@ -4,7 +4,7 @@ export default function LoginButton() {
     const { mutate, loading } = usePostSmart("/login");
 
     const handleLogin = () => {
-        mutate({ email: "zaid@gmail.com" })
+        mutate({ email: "Test@gmail.com" })
             .then(res => {
                 localStorage.setItem("accessToken", res.accessToken);
                 localStorage.setItem("refreshToken", res.refreshToken);

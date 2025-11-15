@@ -5,6 +5,22 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.0.11] - 2025-11-15
+### Added
+- Documentation and examples: improved `README`, `README.npm.md`, and `examples/README.md` to reflect cache persistence and provider options.
+
+### Fixed
+- Removed noisy debug console output in runtime: `useGetSmart` and `cacheDriver` no longer emit casual logs.
+- Gated IndexedDB error logging so errors are only printed in non-production builds.
+
+### Changed
+- `FetchSmartDevtools` is gated and will not render in production builds to avoid leaking internals or causing runtime noise.
+
+### Improved
+- Minor stability and resilience improvements in cache interactions and devtools inspection flows.
+
+---
+
 ## [Unreleased]
 ### Added
 - README: Added Provider setup example showing `refreshToken`, `retryLimit`, and `FetchSmartDevtools`.

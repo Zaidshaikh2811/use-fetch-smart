@@ -1,4 +1,3 @@
-
 export interface CacheItem<T> {
     data: T;
     expiry: number | null; // timestamp (ms)
@@ -30,5 +29,17 @@ export const memoryCache = {
 
     clear() {
         memoryStore.clear();
+    },
+    keys() {
+        return Array.from(memoryStore.keys());
+    },
+
+
+    dump() {
+        return Array.from(memoryStore.entries()).map(([key, item]) => ({
+            key,
+            data: item.data,
+            expiry: item.expiry,
+        }));
     }
 };

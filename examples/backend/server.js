@@ -12,7 +12,7 @@ const REFRESH_SECRET = "my-refresh-secret-key";
 let refreshTokens = []; // store refresh tokens in memory
 
 let users = [
-    { id: 1, name: "Zaid", email: "zaid@gmail.com" },
+    { id: 1, name: "Test", email: "Test@gmail.com" },
     { id: 2, name: "Sara", email: "sara@gmail.com" }
 ];
 
@@ -39,7 +39,6 @@ function generateRefreshToken(user) {
 // ---------------------------
 
 app.get("/users", (req, res) => {
-    console.log("User Get API");
 
     res.json(users);
 });
@@ -66,18 +65,16 @@ app.post("/login", (req, res) => {
 
 app.post("/auth/refresh", (req, res) => {
     const { refreshToken } = req.body;
-    console.log("Refresh TOken");
-
 
     if (!refreshToken)
         return res.status(401).json({ message: "Refresh token required" });
 
     if (!refreshTokens.includes(refreshToken))
-        return res.status(403).json({ message: "Invalid refresh token" });
+        return res.status(401).json({ message: "Invalid refresh token" });
 
     jwt.verify(refreshToken, REFRESH_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ message: "Token expired" });
-        console.log("Success");
+        if (err) return res.status(401).json({ message: "Token expired" });
+
 
         const newAccessToken = generateAccessToken(user);
 
@@ -101,10 +98,10 @@ function authMiddleware(req, res, next) {
 
 
     jwt.verify(token, ACCESS_SECRET, (err, decoded) => {
-        if (err) return res.status(403).json({ message: "Invalid or expired token" });
+        if (err) return res.status(401).json({ message: "Invalid or expired token" });
 
         req.user = decoded;
-        console.log("User:", req.user);
+
 
         next();
     });
