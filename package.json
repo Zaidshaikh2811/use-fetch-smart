@@ -1,6 +1,6 @@
 {
   "name": "use-fetch-smart",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A smart React data-fetching hook with caching, retries, TTL, and auto token refresh.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -13,18 +13,18 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-     "react",
-  "react-hooks",
-  "fetch",
-  "data-fetching",
-  "axios",
-  "cache",
-  "react-query",
-  "swr",
-  "typescript",
-  "retry",
-  "jwt",
-  "refresh-token"
+    "react",
+    "react-hooks",
+    "fetch",
+    "data-fetching",
+    "axios",
+    "cache",
+    "react-query",
+    "swr",
+    "typescript",
+    "retry",
+    "jwt",
+    "refresh-token"
   ],
   "repository": {
     "type": "git",
