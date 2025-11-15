@@ -37,7 +37,7 @@ export const createSmartAxios = (
             if (!config) return Promise.reject(error);
 
             // ---- Auto Refresh Token ----
-            if (error.response?.status === 403 && refreshTokenFn) {
+            if (error.response?.status === 401 && refreshTokenFn) {
                 console.log("Auto Refresh Token ");
 
                 if (!refreshPromise) refreshPromise = refreshTokenFn();
