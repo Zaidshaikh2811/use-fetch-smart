@@ -33,7 +33,6 @@ const refreshToken = async () => {
 export const setAccessToken = (token) => {
   ACCESS_TOKEN = token;
 }
-console.log("getTOken", getToken());
 
 
 createRoot(document.getElementById('root')).render(

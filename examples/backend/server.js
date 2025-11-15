@@ -38,8 +38,8 @@ function generateRefreshToken(user) {
 //         LOGIN
 // ---------------------------
 
-app.get("/users", (req, res) => {
-
+app.get("/users", async (req, res) => {
+    await new Promise(resolve => setTimeout(resolve, 5000));
     res.json(users);
 });
 
@@ -149,6 +149,11 @@ app.delete("/users/:id", (req, res) => {
 
 app.get("/statuserror", (req, res) => {
     res.status(403).json({ message: "Internal Server Error" });
+});
+
+
+app.get("/internal-server-error", (req, res) => {
+    res.status(500).json({ message: "Internal Server Error" });
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));
