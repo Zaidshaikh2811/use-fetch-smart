@@ -5,6 +5,10 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.0.12-13] - 2025-11-15
+### Updated Readme For better clarity and working  of Npm package
+
+
 ## [1.0.11] - 2025-11-15
 ### Added
 - Documentation and examples: improved `README`, `README.npm.md`, and `examples/README.md` to reflect cache persistence and provider options.
