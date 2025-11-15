@@ -13,10 +13,9 @@ export function useGetSmart<T = any>(
 
     const cacheKey = url;
 
-    // Convert ms → seconds correctly
-    const ttlSeconds = opts?.cacheTimeMs
-        ? opts.cacheTimeMs / 1000
-        : 300; // default 5 minutes
+    const ttlMs = opts?.cacheTimeMs ?? 0;
+    console.log("TTlms:", ttlMs);
+
 
     // Read from cache ONCE during mount
     const [data, setData] = useState<T | null>(() => cache.get<T>(cacheKey));
@@ -33,7 +32,7 @@ export function useGetSmart<T = any>(
             const res = await api.get<T>(url);
             setData(res.data);
 
-            cache.set(cacheKey, res.data, ttlSeconds, opts?.persist ?? false);
+            cache.set(cacheKey, res.data, ttlMs, opts?.persist ?? false);
 
         } catch (err) {
             setError(err);

@@ -28,6 +28,7 @@ export const FetchSmartDevtools = () => {
                 padding: 12,
                 borderRadius: 8,
                 boxShadow: "0 0 14px rgba(0,0,0,0.3)",
+                color: "white",
             }}
         >
             <button onClick={() => setOpen(false)}>Close</button>

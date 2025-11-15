@@ -10,7 +10,13 @@ export default function DeleteUser({ userId, onDeleted }) {
         });
     };
 
-    return <button disabled={loading} onClick={handleDelete}>
-        {loading ? "Deleting..." : "Delete"}
-    </button>;
+    return (
+        <button
+            disabled={loading}
+            onClick={handleDelete}
+            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+        >
+            {loading ? "Deleting..." : "Delete"}
+        </button>
+    );
 }

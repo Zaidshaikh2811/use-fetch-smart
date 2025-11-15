@@ -36,9 +36,9 @@ export const createSmartAxios = (
             const config = error.config;
             if (!config) return Promise.reject(error);
 
-            // ---- Auto Refresh Token ----
+            // ---- Stored refresh token----
             if (error.response?.status === 401 && refreshTokenFn) {
-                console.log("Auto Refresh Token ");
+
 
                 if (!refreshPromise) refreshPromise = refreshTokenFn();
                 const newToken = await refreshPromise;
@@ -50,6 +50,8 @@ export const createSmartAxios = (
                     return api(config); // retry original request
                 }
             }
+
+
 
             // ---- Retry for network + 5xx ----
             config.__retry = config.__retry || 0;

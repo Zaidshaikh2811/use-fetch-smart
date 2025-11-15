@@ -6,8 +6,8 @@ interface CacheItem<T> {
 export const memoryCache = new Map<string, CacheItem<any>>();
 
 export const cache = {
-    set<T>(key: string, data: T, ttlSeconds?: number, persist?: boolean) {
-        const expiry = ttlSeconds ? Date.now() + ttlSeconds * 1000 : null;
+    set<T>(key: string, data: T, ttlMs?: number, persist?: boolean) {
+        const expiry = ttlMs ? Date.now() + ttlMs : null;
         const item = { data, expiry };
         memoryCache.set(key, item);
 

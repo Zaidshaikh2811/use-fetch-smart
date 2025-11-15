@@ -39,6 +39,8 @@ function generateRefreshToken(user) {
 // ---------------------------
 
 app.get("/users", (req, res) => {
+    console.log("User Get API");
+
     res.json(users);
 });
 
@@ -64,8 +66,6 @@ app.post("/login", (req, res) => {
 
 app.post("/auth/refresh", (req, res) => {
     const { refreshToken } = req.body;
-    console.log("refreshToken received:", refreshToken);
-
 
     if (!refreshToken)
         return res.status(401).json({ message: "Refresh token required" });
@@ -75,6 +75,7 @@ app.post("/auth/refresh", (req, res) => {
 
     jwt.verify(refreshToken, REFRESH_SECRET, (err, user) => {
         if (err) return res.status(403).json({ message: "Token expired" });
+        console.log("Success");
 
         const newAccessToken = generateAccessToken(user);
 
@@ -87,14 +88,14 @@ app.post("/auth/refresh", (req, res) => {
 // ---------------------------
 function authMiddleware(req, res, next) {
     const authHeader = req.headers["authorization"];
-    console.log("Authorization header received:", authHeader);
+
 
     if (!authHeader) {
         return res.status(401).json({ message: "No token provided" });
     }
 
     const token = authHeader.split(" ")[1];
-    console.log("token:", token);
+
 
 
     jwt.verify(token, ACCESS_SECRET, (err, decoded) => {
@@ -145,6 +146,10 @@ app.delete("/users/:id", (req, res) => {
     }
     users.splice(userIndex, 1);
     res.status(204).end();
+});
+
+app.get("/statuserror", (req, res) => {
+    res.status(403).json({ message: "Internal Server Error" });
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));
