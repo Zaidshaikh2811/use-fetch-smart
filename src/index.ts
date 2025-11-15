@@ -12,7 +12,7 @@ export * from "./FetchSmartDevtools";
 
 // Core utils
 export * from "./smartAxios";
-export * from "./cache";
+export * from "./cache/cache";
 
 // Types
 export * from "./types"; 

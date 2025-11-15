@@ -66,6 +66,8 @@ app.post("/login", (req, res) => {
 
 app.post("/auth/refresh", (req, res) => {
     const { refreshToken } = req.body;
+    console.log("Refresh TOken");
+
 
     if (!refreshToken)
         return res.status(401).json({ message: "Refresh token required" });

@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { cache, memoryCache } from "./cache";
+import { cache, memoryCache } from "./cache/cache";
 
 export const FetchSmartDevtools = () => {
     const [open, setOpen] = useState(false);

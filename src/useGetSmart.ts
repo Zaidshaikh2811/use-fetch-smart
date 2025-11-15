@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { cache } from "./cache";
+import { cache } from "./cache/cache";
 import { useFetchSmartContext } from "./FetchSmartProvider";
+import { cacheDriver } from "./cache/cacheDriver";
+
 
 export function useGetSmart<T = any>(
     url: string,
     opts?: {
         cacheTimeMs?: number;
         persist?: boolean;
+        swr?: boolean;
     }
 ) {
     const { axiosInstance: api } = useFetchSmartContext();
@@ -21,19 +24,48 @@ export function useGetSmart<T = any>(
     const [data, setData] = useState<T | null>(() => cache.get<T>(cacheKey));
     const [loading, setLoading] = useState(!data);
     const [error, setError] = useState<any>(null);
+    const swr = opts?.swr ?? false;
 
     const didRun = useRef(false);
 
-    const fetchData = async () => {
-        setLoading(true);
-        setError(null);
 
+
+    useEffect(() => {
+        if (didRun.current) return;
+        didRun.current = true;
+
+        let mounted = true;
+
+        (async () => {
+            const cached = await cacheDriver.get<T>(cacheKey, opts?.persist);
+
+            if (!mounted) return;
+
+            if (cached) {
+                setData(cached);
+                setLoading(false); // no loader when cached
+            }
+
+            // SWR: always revalidate in background
+            if (swr || !cached) {
+                revalidate();
+            }
+        })();
+
+        return () => {
+            mounted = false;
+        };
+    }, [url]);
+
+    const revalidate = async () => {
         try {
             const res = await api.get<T>(url);
             setData(res.data);
 
-            cache.set(cacheKey, res.data, ttlMs, opts?.persist ?? false);
-
+            await cacheDriver.set(cacheKey, res.data, {
+                ttlMs,
+                persist: opts?.persist,
+            });
         } catch (err) {
             setError(err);
         } finally {
@@ -41,17 +73,5 @@ export function useGetSmart<T = any>(
         }
     };
 
-    useEffect(() => {
-        // Only run once per mount (prevents double fetch)
-        if (didRun.current) return;
-        didRun.current = true;
-
-        if (!data) {
-            console.log("DATA in if:", data);
-
-            fetchData();
-        }
-    }, [url]);
-
-    return { data, loading, error, refetch: fetchData };
+    return { data, loading, error, refetch: revalidate };
 }

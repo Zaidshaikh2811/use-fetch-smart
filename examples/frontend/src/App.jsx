@@ -8,7 +8,7 @@ import TestProtected from "./components/TestProtected";
 
 export default function App() {
     const { data, loading, error, refetch } = useGetSmart("/users", {
-        cacheTimeMs: 500,
+        cacheTimeMs: 50000,
         persist: true,
     });
 

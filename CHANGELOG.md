@@ -1,5 +1,5 @@
 # 📦 Changelog
-All notable changes to **use-fetch-smart** will be documented in this file.
+All notable changes to **use-fetch-smart** are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/).
 
@@ -7,46 +7,104 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 ### Added
-- README: Provider setup example showing `refreshToken` + `retryLimit` and `FetchSmartDevtools` usage.
+- README: Added Provider setup example showing `refreshToken`, `retryLimit`, and `FetchSmartDevtools`.
 
 ### Fixed
-- Clarified exports and utilities (exports for axios helper and token utilities). Note: `package.json` still shows `1.0.3`; consider running `npm version patch` to align package version with changelog.
+- Clarified exports for axios helpers and token utilities.  
+  *(Note: npm still shows version `1.0.3`; consider running `npm version patch` to sync with changelog.)*
 
 ### Improved
-- Small stability and documentation fixes across `smartAxios`, cache handling, and devtools.
+- Minor stability updates across `smartAxios`, cache handling, and devtools.
+
+---
+
+## [1.0.10] - 2025-11-15
+### Added
+- Release bump consolidating all cache refactors, examples, and documentation updates.
+
+### Fixed
+- Cache expiry edge cases and safer IndexedDB interactions.
+
+### Improved
+- Better interceptor retry logic and enhanced error handling.
+- Expanded migration and usage documentation.
+
+---
+
+## [1.0.9] - 2025-11-15
+### Improved
+- Packaging improvements: ensured TypeScript definitions and build output include new cache modules.
+- Updated `package.json` metadata: homepage, repository, keywords, and dependencies.
+
+---
+
+## [1.0.8] - 2025-11-15
+### Added
+- Persistent cache support using `idb-keyval` + IndexedDB.
+
+### Changed
+- Updated build artifacts to include new cache modules and related dependencies.
+
+---
+
+## [1.0.7] - 2025-11-14
+### Added
+- Expanded documentation: Provider setup, best practices, and performance optimization tips.
+
+### Fixed
+- Minor corrections in examples (hook usage, option names).
+
+---
+
+## [1.0.6] - 2025-11-14
+### Added
+- `examples/` folder including:
+  - Minimal Express backend  
+  - Vite React frontend using `FetchSmartProvider` + hooks  
+- Added examples README with instructions.
+
+### Improved
+- Devtools: safer inspection of internal cache structures and better key display.
+
+---
+
+## [1.0.5] - 2025-11-14
+### Added
+- New layered caching system:
+  - `memoryCache`
+  - `indexedDBCache`
+- Introduced `cacheDriver` for seamless read/write with per-entry persistence options.
+
+### Improved
+- Refactored cache internals:
+  - Unified TTL handling (ms)
+  - Cleaner, consistent `get/set` semantics
 
 ---
 
 ## [1.0.4] - 2025-11-14
 ### Added
-- Exported `axiosInstance` helper and `setGlobalToken` for advanced usage.
-- `smartAxios` now supports a `refreshTokenFn` for automatic 401 token refresh and request replay.
-- `FetchSmartProvider` accepts `retryLimit` and `refreshToken` in its config; `useFetchSmartContext` exposes the library axios instance.
+- Exported `axiosInstance` and `setGlobalToken` for advanced control.
+- `smartAxios` now supports `refreshTokenFn` for 401 token refresh + request replay.
+- `FetchSmartProvider` now accepts `retryLimit` and `refreshToken`.
+- Exposed internal axios instance via `useFetchSmartContext`.
 
 ### Fixed
-- Cache TTL and persistence edge-cases (expiry checks and memory/localStorage synchronization).
-- Devtools read logic hardened to avoid errors when internal cache structures differ.
+- TTL sync issues between memory/localStorage and stale cache entries.
+- Devtools guards for mismatched cache structure shapes.
 
 ### Improved
-- Retry/backoff logic refinements and stability improvements in interceptors.
-- Hook stability: reduce unnecessary re-renders and improve error handling.
-- Documentation updates (README examples for provider + devtools).
+- Interceptor retry/backoff stability.
+- Reduced unnecessary hook re-renders.
+- Updated documentation (Provider + Devtools examples).
 
 ---
 
 ## [1.0.3] - 2025-11-13
 ### Added
-- Added `useGetSmart` hook with cacheTimeMs TTL caching.
-- Added support for auto-token refresh via `refreshTokenFn`.
-- Added `FetchSmartDevtools` for debugging cache + requests.
-
-### Improved
-- Improved retry logic with exponential backoff.
-- Improved caching key to include baseURL.
-
-### Fixed
-- Fixed TTL in cache system (ms → seconds conversion).
-- Fixed infinite rerenders in useEffect dependencies.
+- Full `useGetSmart` with TTL-based caching (`cacheTimeMs`).
+- Auto token refresh architecture via `refreshTokenFn`.
+- `FetchSmartDevtools` for cache & request debugging.
 
 ---
 
@@ -55,19 +113,21 @@ This project follows [Semantic Versioning](https://semver.org/).
 - Added `usePostSmart`, `usePutSmart`, `useDeleteSmart`.
 
 ### Improved
-- SmartAxios interceptor stability.
+- `smartAxios` interceptor reliability.
 
 ---
 
 ## [1.0.1] - 2025-11-13
 ### Added
-- Initial GET hook implementation.
-- Memory + localStorage cache manager.
-- Basic retry logic & error handling.
+- Initial `useGetSmart` implementation.
+- Memory cache + localStorage persistence.
+- Basic retry logic and error handling.
 
 ---
 
 ## [1.0.0] - 2025-11-12
 ### Initial Release
-- Basic infrastructure for npm package.
-- Folder structure prepared.
+- Structured repository.
+- Initial library setup, configs, and base architecture.
+
+---

@@ -1,37 +1,12 @@
 # 🚀 **use-fetch-smart**
-<p align="left">
-
-  <a href="https://www.npmjs.com/package/use-fetch-smart">
-    <img src="https://img.shields.io/npm/v/use-fetch-smart?color=blue&label=npm%20version" alt="npm version" />
-  </a>
-
-  <a href="https://www.npmjs.com/package/use-fetch-smart">
-    <img src="https://img.shields.io/npm/dm/use-fetch-smart?color=brightgreen&label=downloads" alt="npm downloads" />
-  </a>
-
-  <a href="https://bundlephobia.com/package/use-fetch-smart">
-    <img src="https://img.shields.io/bundlephobia/minzip/use-fetch-smart?label=bundle%20size" alt="bundle size" />
-  </a>
-
-  <a href="https://github.com/Zaidshaikh2811/use-fetch-smart">
-    <img src="https://img.shields.io/github/stars/Zaidshaikh2811/use-fetch-smart?color=yellow&label=stars" alt="GitHub stars" />
-  </a>
-
-  <a href="https://github.com/Zaidshaikh2811/use-fetch-smart/network/members">
-    <img src="https://img.shields.io/github/forks/Zaidshaikh2811/use-fetch-smart?color=orange&label=forks" alt="GitHub forks" />
-  </a>
-
-  <a href="https://github.com/Zaidshaikh2811/use-fetch-smart/issues">
-    <img src="https://img.shields.io/github/issues/Zaidshaikh2811/use-fetch-smart?color=red&label=issues" alt="Open issues" />
-  </a>
-
-  <a href="https://github.com/Zaidshaikh2811/use-fetch-smart">
-    <img src="https://img.shields.io/npm/l/use-fetch-smart?color=lightgrey&label=license" alt="license" />
-  </a>
-
-</p>
 
 ### A smart React data-fetching library with **caching**, **retry logic**, **TTL**, **auto token refresh**, and simple **mutation hooks**.
+
+[![npm version](https://img.shields.io/npm/v/use-fetch-smart.svg)](https://www.npmjs.com/package/use-fetch-smart)
+[![npm downloads](https://img.shields.io/npm/dm/use-fetch-smart.svg)]()
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/zaidshaikh2811/use-fetch-smart)
+[![license](https://img.shields.io/npm/l/use-fetch-smart.svg)]()
+
 ---
 
 # ✨ Why use-fetch-smart?
