@@ -1,6 +1,6 @@
 {
   "name": "use-fetch-smart",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A smart React data-fetching hook with caching, retries, TTL, and auto token refresh.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
