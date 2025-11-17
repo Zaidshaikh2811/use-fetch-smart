@@ -25,18 +25,18 @@ A quick look at how **use-fetch-smart** behaves in real apps:
 
 ### 🔄 Auto Fetch + Loading State
 <p align="center">
-<img src="./assets/Untitled design (2).mp4" width="500" />
+<img src="./assets/Untitled design (2).gif width="500" />
 </p>
 
 ### ⚡ Instant Response From Cache
 <p align="center">
-<img src="./assets/Untitled design (1).mp4" width="500" />
+<img src="./assets/Untitled design (1).gif" width="500" />
 </p>
 
 
 ### 🔁 Retry Logic in Action
 <p align="center">
-<img src="./assets/Untitled design.mp4" width="500" />
+<img src="./assets/Untitled design.gif" width="500" />
 </p>
 ---
 
