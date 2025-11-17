@@ -17,6 +17,29 @@ A smart React data-fetching library with caching, TTL, retries, token auto-refre
 
 ---
 
+---
+
+## 🎥 Demo Preview
+
+A quick look at how **use-fetch-smart** behaves in real apps:
+
+### 🔄 Auto Fetch + Loading State
+<p align="center">
+<img src="./assets/Untitled design (2).mp4" width="500" />
+</p>
+
+### ⚡ Instant Response From Cache
+<p align="center">
+<img src="./assets/Untitled design (1).mp4" width="500" />
+</p>
+
+
+### 🔁 Retry Logic in Action
+<p align="center">
+<img src="./assets/Untitled design.mp4" width="500" />
+</p>
+---
+
 ## Installation
 
 ```bash
