@@ -5,9 +5,22 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.1.0] - 2025-11-19
+### Added
+- Schema validation support for mutation hooks (optional runtime validation using user-provided schemas).
+
+### Fixed
+- Export surface: made `cacheDriver`, `memoryCache`, and `indexedDBCache` available from the package entrypoint and resolved duplicate type re-export issues.
+- Examples: fixed frontend `LoginButton` example to correct JSX and login flow.
+- Removed noisy debug logging and gated devtools to not render in production.
+
+### Docs
+- Improved `README.md`, `README.npm.md`, and `README.github.md` to reflect cache persistence, schema validation, and example usage.
+
+---
+
 ## [1.0.12-13] - 2025-11-15
 ### Updated Readme For better clarity and working  of Npm package
-
 
 ## [1.0.11] - 2025-11-15
 ### Added

@@ -21,12 +21,12 @@ export const FetchSmartProvider = ({
     config: FetchSmartConfig;
     children: React.ReactNode;
 }) => {
-    // Set global token if provided
+
     if (config.token) {
         setGlobalToken(config.token);
     }
 
-    // Create ONE stable axios instance
+
     const axiosRef = useRef(
         createSmartAxios(
             config.baseURL || "",
@@ -42,7 +42,7 @@ export const FetchSmartProvider = ({
     );
 };
 
-// 🔥 Hook to read axios instance from provider
+
 export const useFetchSmartContext = () => {
     const ctx = useContext(FetchSmartContext);
     if (!ctx) {
