@@ -39,7 +39,7 @@ function generateRefreshToken(user) {
 // ---------------------------
 
 app.get("/users", async (req, res) => {
-    await new Promise(resolve => setTimeout(resolve, 5000));
+
     res.json(users);
 });
 

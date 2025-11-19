@@ -4,6 +4,10 @@ export interface CacheItem<T> {
     data: T;
     expiry: number | null;
 }
+const isDev = (() => {
+    const env = (globalThis as any)?.process?.env?.NODE_ENV;
+    return env !== "production";
+})();
 
 export const indexedDBCache = {
     async get<T>(key: string): Promise<T | null> {
@@ -17,7 +21,8 @@ export const indexedDBCache = {
             }
 
             return item.data;
-        } catch {
+        } catch (err) {
+            if (isDev) console.error("IndexedDB get error", err);
             return null;
         }
     },
@@ -26,13 +31,17 @@ export const indexedDBCache = {
         const expiry = ttlMs ? Date.now() + ttlMs : null;
         try {
             await set(key, { data, expiry } as CacheItem<T>);
-        } catch { }
+        } catch (err) {
+            if (isDev) console.error("IndexedDB set error", err);
+        }
     },
 
     async delete(key: string) {
         try {
             await del(key);
-        } catch { }
+        } catch (err) {
+            if (isDev) console.error("IndexedDB delete error", err);
+        }
     },
 
 
@@ -40,17 +49,11 @@ export const indexedDBCache = {
         try {
             return await keys();
         } catch (err) {
-            const _proc: any = (globalThis as any).process;
-            if (_proc && _proc.env && _proc.env.NODE_ENV !== 'production') {
-                // log only in non-production builds
-                // @ts-ignore
-                console.error("IndexedDB keys error", err);
-            }
+            if (isDev) console.error("IndexedDB keys error", err);
             return [];
         }
     },
 
-    /** ⭐ REQUIRED BY DEVTOOLS: dump all items */
     async dump(): Promise<any[]> {
         try {
             const allKeys = await keys();
@@ -69,12 +72,7 @@ export const indexedDBCache = {
 
             return output;
         } catch (err) {
-            const _proc: any = (globalThis as any).process;
-            if (_proc && _proc.env && _proc.env.NODE_ENV !== 'production') {
-                // log only in non-production builds
-                // @ts-ignore
-                console.error("IndexedDB dump error", err);
-            }
+            if (isDev) console.error("IndexedDB dump error", err);
             return [];
         }
     }

@@ -1,4 +1,3 @@
-import UsersList from "./components/UsersList";
 import CreateUser from "./components/CreateUser";
 import UpdateUser from "./components/UpdateUser";
 import DeleteUser from "./components/DeleteUser";
@@ -6,15 +5,25 @@ import { useGetSmart } from "use-fetch-smart";
 import LoginButton from "./components/LoginButton";
 import TestProtected from "./components/TestProtected";
 
+import { z } from "zod";
+
+const usersSchema = z.array(
+    z.object({
+        id: z.number(),
+        name: z.string(),
+        email: z.string().email(),
+    }).strict()
+);
 export default function App() {
     const { data, loading, error, refetch } = useGetSmart("/users", {
         cacheTimeMs: 50000,
         persist: true,
+        schema: usersSchema,
     });
 
-    if (loading) return <p className="text-gray-600 p-4">Loading users...</p>;
-    if (error) return <p className="text-red-500 p-4">Error loading users</p>;
 
+    if (loading) return <p className="text-gray-600 p-4">Loading users...</p>;
+    if (error) return <p className="text-red-500 p-4">{error.message}</p>;
     return (
         <div className="max-w-3xl mx-auto p-6 space-y-6">
             <h1 className="text-3xl font-bold text-blue-700">CRUD with use-fetch-smart</h1>

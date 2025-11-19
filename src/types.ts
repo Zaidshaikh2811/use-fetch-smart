@@ -1,3 +1,11 @@
+
+export interface SchemaValidator<T = any> {
+    parse: (data: unknown) => T;
+}
+
+export type SchemaMode = "error" | "warn";
+
+
 export interface FetchOptions {
     cache?: boolean;
     persist?: boolean;

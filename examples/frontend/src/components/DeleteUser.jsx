@@ -1,7 +1,16 @@
 import { useDeleteSmart } from "use-fetch-smart";
+import { z } from "zod";
+
+
+const deleteUserSchema = z.object({
+    success: z.boolean(),
+}).strict();
+
 
 export default function DeleteUser({ userId, onDeleted }) {
-    const { mutate, loading } = useDeleteSmart(`/users/${userId}`);
+    const { mutate, loading } = useDeleteSmart(`/users/${userId}`, {
+        schema: deleteUserSchema,
+    });
 
     const handleDelete = () => {
         mutate(null).then(() => {

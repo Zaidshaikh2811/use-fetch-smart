@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useFetchSmartContext } from "./FetchSmartProvider";
 import { cacheDriver } from "./cache/cacheDriver";
+import { validateWithSchema } from "./utils/validateWithSchema";
+import { SchemaMode, SchemaValidator } from "./types";
 
 
 export function useGetSmart<T = any>(
@@ -9,6 +11,8 @@ export function useGetSmart<T = any>(
         cacheTimeMs?: number;
         persist?: boolean;
         swr?: boolean;
+        schema?: SchemaValidator<T>;
+        schemaMode?: SchemaMode;
     }
 ) {
     const { axiosInstance: api } = useFetchSmartContext();
@@ -17,14 +21,12 @@ export function useGetSmart<T = any>(
 
     const ttlMs = opts?.cacheTimeMs ?? 0;
 
-
-    // Read from cache ONCE during mount
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(!data);
     const [error, setError] = useState<any>(null);
     const swr = opts?.swr ?? false;
-
     const didRun = useRef(false);
+
 
 
 
@@ -41,10 +43,9 @@ export function useGetSmart<T = any>(
 
             if (cached) {
                 setData(cached);
-                setLoading(false); // no loader when cached
+                setLoading(false);
             }
 
-            // SWR: always revalidate in background
             if (swr || !cached) {
                 revalidate();
             }
@@ -58,9 +59,19 @@ export function useGetSmart<T = any>(
     const revalidate = async () => {
         try {
             const res = await api.get<T>(url);
-            setData(res.data);
 
-            await cacheDriver.set(cacheKey, res.data, {
+
+            const validated = validateWithSchema(
+                res.data,
+                opts?.schema,
+                opts?.schemaMode ?? "error",
+                url
+            );
+
+            setData(validated);
+
+
+            await cacheDriver.set(cacheKey, validated, {
                 ttlMs,
                 persist: opts?.persist,
             });

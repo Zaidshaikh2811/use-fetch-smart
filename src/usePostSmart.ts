@@ -1,9 +1,14 @@
-// usePostSmart.ts
 import { useState } from "react";
 import { useFetchSmartContext } from "./FetchSmartProvider";
+import { SchemaMode, SchemaValidator } from "./types";
+import { validateWithSchema } from "./utils/validateWithSchema";
 
 export function usePostSmart<T = any, Body = any>(
     url: string,
+    opts?: {
+        schema?: SchemaValidator<T>,
+        schemaMode?: SchemaMode
+    }
 ) {
     const { axiosInstance: api } = useFetchSmartContext();
     const [data, setData] = useState<T | null>(null);
@@ -15,11 +20,18 @@ export function usePostSmart<T = any, Body = any>(
         setError(null);
         try {
             const res = await api.post<T>(url, body);
-            setData(res.data);
-            return res.data;
+            const validated = validateWithSchema(
+                res.data,
+                opts?.schema,
+                opts?.schemaMode ?? "error",
+                url
+            );
+
+            setData(validated);
+            return validated;
         } catch (err) {
             setError(err);
-            throw err;
+            return null;
         } finally {
             setLoading(false);
         }

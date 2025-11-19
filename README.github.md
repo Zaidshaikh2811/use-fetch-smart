@@ -6,6 +6,14 @@ A smart React data-fetching library with caching, TTL, retries, token auto-refre
 
 ---
 
+## What's New (v1.0.14)
+
+- Schema validation for mutation hooks: `usePostSmart`, `usePutSmart`, and `useDeleteSmart` accept an optional `schema` + `schemaMode` to validate responses at runtime.
+- Public exports improved: cache utilities (`cacheDriver`, `memoryCache`, `indexedDBCache`) and `validateWithSchema` are available from the package entrypoint for advanced use.
+- Documentation and examples refreshed (npm README and GitHub README) and example frontend fixes applied.
+- Devtools and debug logging: noisy logs removed and `FetchSmartDevtools` gated out in production builds.
+
+
 ## Why use-fetch-smart?
 
 - Single provider (`FetchSmartProvider`) to configure `baseURL`, token handling, retry limits and refresh logic.
@@ -168,14 +176,171 @@ Contributions welcome — open issues or PRs. Please follow standard GitHub work
 ---
 
 ## Changelog
+## 🚀 use-fetch-smart
 
-See `CHANGELOG.md` for release history.
+A smart, TypeScript-first React data-fetching library with caching, TTL, retries, optional schema validation, and automatic token refresh. It provides small, composable hooks and a single provider to configure network and auth behavior.
+
+[![npm version](https://img.shields.io/npm/v/use-fetch-smart.svg)](https://www.npmjs.com/package/use-fetch-smart) [![license](https://img.shields.io/npm/l/use-fetch-smart.svg)]()
+
+---
+
+## What's New (v1.0.13)
+
+- Optional runtime schema validation for mutation hooks: pass a `schema` (e.g., Zod) and `schemaMode` to `usePostSmart`, `usePutSmart`, and `useDeleteSmart` to validate responses.
+- Public exports improved: `cacheDriver`, `memoryCache`, `indexedDBCache`, and `validateWithSchema` are available from the package entrypoint for advanced usages.
+- Docs and examples refreshed; frontend example fixes applied.
+- Developer ergonomics: removed noisy debug logs and gated `FetchSmartDevtools` from production builds.
+
+---
+
+## Why use-fetch-smart?
+
+- Single provider (`FetchSmartProvider`) to configure `baseURL`, token handling, retry limits and optional `refreshToken` logic.
+- Small hooks for GET and mutations with built-in caching and optional persistence.
+- Layered cache (in-memory + optional IndexedDB persistence via `idb-keyval`) with TTLs.
+- Optional schema validation for mutation responses (integrates easily with Zod or other runtime validators).
+- Automatic token refresh on 401 and request replay with retry/backoff logic.
+
+---
+
+## Installation
+
+```bash
+npm install use-fetch-smart
+# or
+yarn add use-fetch-smart
+```
+
+Peer dependencies: `react` and `react-dom` (>=17).
+
+---
+
+## Quick Start
+
+Wrap your app with `FetchSmartProvider` and pass a `refreshToken` function to enable automatic token refresh.
+
+```tsx
+import React from 'react';
+import { FetchSmartProvider, FetchSmartDevtools } from 'use-fetch-smart';
+
+const refreshToken = async () => {
+  const res = await fetch('/auth/refresh');
+  if (!res.ok) return null;
+  const json = await res.json();
+  return json.token;
+};
+
+export default function AppRoot() {
+  return (
+    <FetchSmartProvider config={{ baseURL: 'http://localhost:4000', retryLimit: 3, refreshToken }}>
+      <App />
+      {/* Devtools render only in non-production builds */}
+      <FetchSmartDevtools />
+    </FetchSmartProvider>
+  );
+}
+```
+
+---
+
+## Core Hooks
+
+- `useGetSmart<T>(url, { cacheTimeMs?, persist?, swr? })` — returns `{ data, loading, error, refetch }`.
+  - `cacheTimeMs` — TTL in milliseconds.
+  - `persist` — write to IndexedDB (optional per-entry).
+  - `swr` — stale-while-revalidate background revalidation.
+
+- `usePostSmart<T, B>(url, { schema?, schemaMode? })` — returns `{ mutate, data, loading, error }`.
+  - `schema` — optional runtime validator (e.g. Zod) to validate response.
+  - `schemaMode` — `"error" | "warn"` controlling behavior on validation failure.
+- `usePutSmart<T, B>(url, { schema?, schemaMode? })` — same shape as POST.
+- `useDeleteSmart<T>(url, { schema?, schemaMode? })` — same shape as POST/PUT.
+
+See the `examples/` folder for runnable demos demonstrating provider setup, caching, and schema validation.
+
+---
+
+## Cache & Persistence
+
+The library uses a layered cache internally:
+
+- `memoryCache` — in-memory store for fast reads.
+- `indexedDBCache` — persistent storage via `idb-keyval` when `persist: true` is used.
+- `cacheDriver` — unified API used by hooks: reads from IndexedDB when requested and falls back to memory.
+
+Programmatic utilities exported from the package entrypoint:
+
+- `cacheDriver`, `memoryCache`, `indexedDBCache` — advanced cache operations and inspection.
+- `validateWithSchema` — helper used internally for schema validation (available for advanced usage).
+- `setGlobalToken(token)` — set or replace the auth token globally.
+
+Example:
+
+```tsx
+useGetSmart('/settings', { cacheTimeMs: 10 * 60_000, persist: true, swr: true });
+```
+
+---
+
+## Devtools
+
+`<FetchSmartDevtools />` provides a compact development UI to inspect cached entries and TTLs. It is safe to include in your app during development; the component is intentionally gated and will not render in production builds.
+
+---
+
+## Examples (run locally)
+
+Includes runnable examples: an Express backend and a Vite React frontend.
+
+```powershell
+# Backend
+cd examples/backend
+npm install
+node server.js
+
+# Frontend
+cd examples/frontend
+npm install
+npm run dev
+```
+
+---
+
+## Best Practices & Notes
+
+- Choose `cacheTimeMs` according to how often the endpoint changes.
+- Use `persist: true` only when you need cross-session caching (e.g., user preferences).
+- After mutations, call `refetch()` or clear the related cache keys to keep UI consistent.
+- Keep `retryLimit` low for mutation endpoints to avoid duplicated side effects.
+
+Security: prefer httpOnly cookies for tokens; if using tokens in client-side code, handle them carefully.
+
+---
+
+## API Reference (short)
+
+- `FetchSmartProvider(config: { baseURL, token?, retryLimit?, refreshToken? })`
+- `useGetSmart<T>(url, { cacheTimeMs?, persist?, swr? })`
+- `usePostSmart<T, B>(url, { schema?, schemaMode? })`
+- `usePutSmart<T, B>(url, { schema?, schemaMode? })`
+- `useDeleteSmart<T>(url, { schema?, schemaMode? })`
+- `FetchSmartDevtools()` — development-only UI (gated in production)
+- `setGlobalToken(token)` — set token globally
+
+---
+
+## Changelog
+
+See `CHANGELOG.md` for release history (v1.0.13 includes schema validation, exports, docs, and example fixes).
+
+---
+
+## Contributing
+
+Contributions are welcome — open issues or PRs. Please follow the standard GitHub workflow.
 
 ---
 
 ## License
 
 MIT © 2025
-
----
- 
