@@ -38,11 +38,81 @@ function generateRefreshToken(user) {
 //         LOGIN
 // ---------------------------
 
-app.get("/users", async (req, res) => {
+const WINDOW = 60 * 60; // seconds
+const LIMIT = 1;
+const store = new Map()
+async function rateLimiter(req, res, next) {
+
+    const ip = req.ip;
+    const now = Date.now();
+
+    const slotStart = now - WINDOW * 1000;
+
+    console.log(slotStart);
+
+    const entry = store.get(ip);
+    console.log(store);
+
+
+    if (!entry) {
+        store.set(ip, { timestamp: now, count: 1 });
+        return next();
+    }
+
+    if (now - entry.timestamp >= WINDOW) {
+        // Reset window
+        store.set(ip, { timestamp: now, count: 1 });
+        return next();
+    }
+
+    entry.count++;
+    console.log(entry.count > LIMIT);
+
+
+    if (entry.count > LIMIT) {
+        return res.status(429).json({ message: "Too many requests" });
+    }
+
+    next();
+
+
+}
+
+async function slidingWIndowRateLimiter(req, res, next) {
+    const ip = req.ip;
+    const now = Date.now();
+
+
+    let timestamp = store.get(ip);
+
+    timestamp.filter(t => t > now - WINDOW * 1000);
+
+    if (timestamp.length >= LIMIT) {
+        return res.status(429).json({ message: "Too many requests" });
+    }
+    timestamp.push(now);
+    store.set(ip, timestamp);
+    next();
+}
+
+
+app.get("/users", rateLimiter, async (req, res) => {
 
     res.json(users);
 });
 
+
+app.get("/prefetchNext", async (req, res) => {
+    console.log("prefetchNext from server");
+
+
+    // res.json([
+    //     { id: 3, name: "Alice", email: "alice@example.com" }
+    // ]);
+    res.json([
+        { id: 3, email: "alice@example.com" }
+    ]);
+});
 
 app.post("/login", (req, res) => {
     const { email } = req.body;
@@ -66,11 +136,12 @@ app.post("/login", (req, res) => {
 app.post("/auth/refresh", (req, res) => {
     const { refreshToken } = req.body;
 
+
     if (!refreshToken)
         return res.status(401).json({ message: "Refresh token required" });
 
-    if (!refreshTokens.includes(refreshToken))
-        return res.status(401).json({ message: "Invalid refresh token" });
+    // if (!refreshTokens.includes(refreshToken))
+    //     return res.status(401).json({ message: "Invalid refresh token" });
 
     jwt.verify(refreshToken, REFRESH_SECRET, (err, user) => {
         if (err) return res.status(401).json({ message: "Token expired" });
