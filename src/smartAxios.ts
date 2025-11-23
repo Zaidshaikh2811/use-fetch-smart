@@ -36,7 +36,11 @@ export const createSmartAxios = (
             const config = error.config;
             if (!config) return Promise.reject(error);
 
-            if (error.response?.status === 401 && refreshTokenFn) {
+            if (error.response?.status === 401 &&
+                latestToken
+                && refreshTokenFn) {
+
+
                 if (!refreshPromise) {
                     refreshPromise = refreshTokenFn();
                 }

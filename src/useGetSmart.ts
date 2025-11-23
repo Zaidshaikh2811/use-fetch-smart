@@ -3,7 +3,9 @@ import { useFetchSmartContext } from "./FetchSmartProvider";
 import { cacheDriver } from "./cache/cacheDriver";
 import { validateWithSchema } from "./utils/validateWithSchema";
 import { SchemaMode, SchemaValidator } from "./types";
+import { prefetchSmart } from "./prefetchSmart";
 
+const inFlightRequests = new Map<string, Promise<any>>();
 
 export function useGetSmart<T = any>(
     url: string,
@@ -13,6 +15,16 @@ export function useGetSmart<T = any>(
         swr?: boolean;
         schema?: SchemaValidator<T>;
         schemaMode?: SchemaMode;
+        prefetchNext?: (
+            data: T,
+            ctx: { url: string }
+        ) => Array<{
+            url: string;
+            schema?: SchemaValidator<any>;
+            schemaMode?: SchemaMode;
+            ttlMs?: number;
+            persist?: boolean;
+        }>;
     }
 ) {
     const { axiosInstance: api } = useFetchSmartContext();
@@ -26,9 +38,16 @@ export function useGetSmart<T = any>(
     const [error, setError] = useState<any>(null);
     const swr = opts?.swr ?? false;
     const didRun = useRef(false);
+    const abortRef = useRef<AbortController | null>(null);
 
+    const mountedRef = useRef(true);
 
-
+    useEffect(() => {
+        return () => {
+            mountedRef.current = false;
+            abortRef.current?.abort();
+        };
+    }, []);
 
     useEffect(() => {
         if (didRun.current) return;
@@ -58,7 +77,35 @@ export function useGetSmart<T = any>(
 
     const revalidate = async () => {
         try {
-            const res = await api.get<T>(url);
+            setLoading(true);
+
+            abortRef.current?.abort();
+            const controller = new AbortController();
+            abortRef.current = controller;
+
+            const signal = controller.signal;
+
+
+            let requestPromise: Promise<any>
+
+            if (inFlightRequests.has(url)) {
+                requestPromise = inFlightRequests.get(url)!;
+            } else {
+                requestPromise = api.get<T>(url, { signal });
+                inFlightRequests.set(url, requestPromise);
+            }
+
+
+            const res = await requestPromise;
+
+
+            if (inFlightRequests.get(url) === requestPromise) {
+                inFlightRequests.delete(url);
+            }
+
+
+            if (signal.aborted) return;
+
 
 
             const validated = validateWithSchema(
@@ -75,6 +122,22 @@ export function useGetSmart<T = any>(
                 ttlMs,
                 persist: opts?.persist,
             });
+
+
+            if (opts?.prefetchNext) {
+                const predictions = opts.prefetchNext(validated, { url });
+
+                predictions?.forEach((p) => {
+                    prefetchSmart<T>(p.url, api, {
+                        ttlMs: p.ttlMs ?? ttlMs,
+                        persist: p.persist ?? opts?.persist,
+                        schema: p.schema ?? opts?.schema,
+                        schemaMode: p.schemaMode ?? opts?.schemaMode,
+                    });
+                });
+            }
+
+
         } catch (err) {
             setError(err);
         } finally {
