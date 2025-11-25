@@ -4,8 +4,8 @@ import { cacheDriver } from "./cache/cacheDriver";
 import { validateWithSchema } from "./utils/validateWithSchema";
 import { SchemaMode, SchemaValidator } from "./types";
 import { prefetchSmart } from "./prefetchSmart";
+import { inFlightRequests } from "./utils/smartDedupe";
 
-const inFlightRequests = new Map<string, Promise<any>>();
 
 export function useGetSmart<T = any>(
     url: string,
@@ -50,35 +50,54 @@ export function useGetSmart<T = any>(
     }, []);
 
     useEffect(() => {
-        if (didRun.current) return;
-        didRun.current = true;
-
-        let mounted = true;
-
-        (async () => {
-            const cached = await cacheDriver.get<T>(cacheKey, opts?.persist);
-
-            if (!mounted) return;
-
-            if (cached) {
-                setData(cached);
-                setLoading(false);
-            }
-
-            if (swr || !cached) {
-                revalidate();
-            }
-        })();
-
-        return () => {
-            mounted = false;
-        };
+        fetchData();
+        return () => abortRef.current?.abort();
     }, [url]);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            abortRef.current?.abort();
+            const controller = new AbortController();
+            abortRef.current = controller;
+
+            let requestPromise: Promise<any>;
+
+
+            if (inFlightRequests.has(url)) {
+
+                requestPromise = inFlightRequests.get(url)!;
+            } else {
+
+                requestPromise = api.get(url, { signal: controller.signal });
+                inFlightRequests.set(url, requestPromise);
+            }
+
+            const res = await requestPromise;
+
+
+            if (inFlightRequests.get(url) === requestPromise) {
+                inFlightRequests.delete(url);
+            }
+
+            const validated = validateWithSchema(res.data, opts?.schema, "error", url);
+            setData(validated);
+            await cacheDriver.set(cacheKey, validated);
+
+        } catch (err) {
+            inFlightRequests.delete(url);
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const revalidate = async () => {
         try {
             setLoading(true);
-
             abortRef.current?.abort();
             const controller = new AbortController();
             abortRef.current = controller;
@@ -94,6 +113,7 @@ export function useGetSmart<T = any>(
                 requestPromise = api.get<T>(url, { signal });
                 inFlightRequests.set(url, requestPromise);
             }
+
 
 
             const res = await requestPromise;
@@ -139,6 +159,7 @@ export function useGetSmart<T = any>(
 
 
         } catch (err) {
+            inFlightRequests.delete(url);
             setError(err);
         } finally {
             setLoading(false);

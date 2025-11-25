@@ -1,45 +1,81 @@
-
----
+--
 
 #  **use-fetch-smart**
 
-> A TypeScript-first, battery-included React data-fetching library with **caching**, **TTL**, **retry with exponential backoff**, **automatic token refresh**, **schema validation**, **predictive prefetching**, and **simple mutation hooks** — all in one tiny API.
+> A smart, TypeScript-first data-fetching library for React with **caching**, **SWR**, **dedupe**, **auto-retry**, **token refresh**, **schema validation**, and the industry-first **predictive prefetching engine** — all in a lightweight API.
 
-[![npm version](https://img.shields.io/npm/v/use-fetch-smart.svg)](https://www.npmjs.com/package/use-fetch-smart)
-[![license](https://img.shields.io/npm/l/use-fetch-smart.svg)]()
-[![bundle size](https://img.shields.io/bundlephobia/minzip/use-fetch-smart?label=gzip)]()
-[![dependencies](https://img.shields.io/librariesio/release/npm/use-fetch-smart)]()
+<p align="center">
+<pre>
+   __  __            __          __           _____                      __   
+  / / / /___  ____  / /_  ____ _/ /____      / ___/____  ____ _________/ /__ 
+ / / / / __ \/ __ \/ __ \/ __ `/ / ___/______\__ \/ __ \/ __ `/ ___/ _  / _ \
+/ /_/ / /_/ / /_/ / /_/ / /_/ / / /__/_____/__/ / /_/ / /_/ / /__/  __/  __/
+/_____/\____/\____/_.___/\__,_/_/\___/    /____/ .___/\__,_/\___/\___/\___/ 
+                                              /_/                             
+</pre>
+</p>
+
+---
+
+<p align="left">
+
+<img src="https://img.shields.io/npm/v/use-fetch-smart?color=blue&style=for-the-badge" />
+<img src="https://img.shields.io/npm/dw/use-fetch-smart?style=for-the-badge&color=yellow" />
+<img src="https://img.shields.io/bundlephobia/min/use-fetch-smart?style=for-the-badge&color=purple" />
+<img src="https://img.shields.io/github/license/zaidshaikh2811/use-fetch-smart?style=for-the-badge&color=brightgreen" />
+<img src="https://img.shields.io/github/stars/zaidshaikh2811/use-fetch-smart?style=for-the-badge&color=orange" />
+<img src="https://img.shields.io/github/last-commit/zaidshaikh2811/use-fetch-smart?style=for-the-badge&color=red" />
+
+</p>
 
 ---
 
 #  Why use-fetch-smart?
 
-Because React Query + SWR are powerful…
-…but sometimes you just need:
+React Query is powerful…
+SWR is simple…
+**use-fetch-smart is BOTH — plus features neither offer.**
 
-* simple hooks
-* predictable cache behavior
-* optional persistence
-* framework-agnostic architecture
-* *zero boilerplate* mutations
-* and **predictive prefetching** that other libs don’t offer
+### ✔ Zero-boilerplate GET/POST/PUT/DELETE
 
-###  Key Features
+### ✔ Dual-layer caching (memory + IndexedDB)
 
-| Feature                                 | Supported  |
-| --------------------------------------- | ---------- |
-| In-memory cache                         | ✅          |
-| IndexedDB persistence                   | ✅          |
-| SWR (stale-while-revalidate)            | ✅          |
-| Retry with exponential backoff          | ✅          |
-| Auto token refresh (401)                | ✅          |
-| Predictive prefetch engine              | **🔥 YES** |
-| Schema validation (Zod/Yup/etc)         | ✅          |
-| Deduped concurrent GET requests         | ✅          |
-| AbortController for stale requests      | ✅          |
-| Concurrency-limited background prefetch | **🔥 YES** |
-| Low network detection (skip on 2G)      | 🔥         |
-| Devtools for inspection                 | ✅          |
+### ✔ SWR baked in
+
+### ✔ Auto request dedupe
+
+### ✔ Automatic retry (exponential backoff)
+
+### ✔ Token refresh with request replay
+
+### ✔ Predictive prefetching (unique to this library)
+
+### ✔ Schema validation (Zod/Yup/Valibot/custom)
+
+### ✔ Devtools (free, built-in)
+
+### ✔ Lightweight and framework-agnostic
+
+---
+
+#  use-fetch-smart vs React Query
+
+| Feature                          | React Query        | **use-fetch-smart** |
+| -------------------------------- | ------------------ | ------------------- |
+| Simple GET/POST/PUT/DELETE hooks | ❌                  | ✅                   |
+| Predictive Prefetching           | ❌                  | 🔥 **Yes**          |
+| GET Request Deduping             | ⚠️ requires config | ✅ built-in          |
+| Token Refresh                    | ❌                  | ✅ automatic         |
+| Schema Validation                | ❌                  | ✅ built-in          |
+| Memory Cache                     | ⚠️                 | ✅                   |
+| IndexedDB Cache                  | ❌                  | ✅                   |
+| Devtools                         | Paywalled on Pro   | FREE                |
+| QueryClient Required             | Yes                | ❌ No                |
+| SWR Mode                         | plugin             | built-in            |
+| Setup                            | complex            | ultra-simple        |
+
+If React Query is “enterprise mode”…
+**use-fetch-smart is “smart mode”.**
 
 ---
 
@@ -53,7 +89,7 @@ yarn add use-fetch-smart
 
 ---
 
-#  Quick Start
+#  Setup
 
 ```tsx
 import { FetchSmartProvider, FetchSmartDevtools } from "use-fetch-smart";
@@ -82,7 +118,7 @@ export default function Root() {
 
 ---
 
-#  Fetch Example
+#  Basic Fetch Example
 
 ```tsx
 const { data, loading, error } = useGetSmart("/users", {
@@ -93,9 +129,9 @@ const { data, loading, error } = useGetSmart("/users", {
 
 ---
 
-#  Predictive Prefetching
+# Predictive Prefetching (Unique Feature)
 
-### **Your library's killer feature (unique).**
+Predict what user will need — fetch it early — without blocking UI.
 
 ```tsx
 useGetSmart("/products?page=1", {
@@ -106,33 +142,27 @@ useGetSmart("/products?page=1", {
 });
 ```
 
-### Prefetch Engine Diagram 
+### Prefetch Engine Flow
 
 ```
 useGetSmart → success
       │
       ▼
-prefetchNext() → predicted URLs
+prefetchNext() returns predictions
       │
       ▼
 prefetchSmart()
       │
-      ├─ throttle
-      ├─ max concurrency (3)
-      ├─ online?
-      ├─ slow network?
-      ├─ cache exists?
-      ├─ in-flight dedupe
-      └─ queued background fetch
+      ├─ throttle (200ms)
+      ├─ max concurrency 3
+      ├─ skip on slow 2G
+      ├─ deduped background requests
+      └─ never blocks UI
 ```
-
-Prefetch NEVER blocks UI.
-Prefetch NEVER overrides valid data.
-Prefetch NEVER spams API.
 
 ---
 
-#  Mutation Hooks
+#  Mutations
 
 ### POST
 
@@ -153,91 +183,74 @@ usePutSmart("/profile").mutate({ theme: "dark" });
 useDeleteSmart("/users/42").mutate();
 ```
 
-Schema validation also works for mutations.
-
 ---
 
-# Schema Validation
-
-Works with:
-
-* Zod
-* Yup
-* Valibot
-* custom validators
-
-Example:
+#  Schema Validation
 
 ```tsx
 useGetSmart("/profile", {
   schema: UserSchema,
-  schemaMode: "error", // or "warn"
+  schemaMode: "error", // "warn" logs instead of throwing
 });
 ```
 
-Error formatting handled internally with `formatSchemaError`.
+Supports:
+
+* Zod
+* Yup
+* Valibot
+* Custom validators
 
 ---
 
 #  Cache Architecture
 
-### Layered design:
-
 ```
 useGetSmart → cacheDriver
        │
-       ├── memoryCache (fast)
-       └── indexedDBCache (persist: true)
+       ├── memoryCache (fastest)
+       └── indexedDBCache (persistent)
 ```
 
-### TTL Flow:
+### TTL Flow
 
 ```
-cacheDriver.get()
-     │
-     ├─ if expired → ignore + fetch
-     ├─ if fresh → return instantly
-     └─ if persist: read from IndexedDB
-```
-
-Exports for advanced usage:
-
-```ts
-import {
-  cacheDriver,
-  memoryCache,
-  indexedDBCache,
-  setGlobalToken,
-  axiosInstance
-} from "use-fetch-smart";
+cache.get()
+│
+├─ if expired → fetch new
+├─ if fresh → return cached
+└─ if persist → check IndexedDB
 ```
 
 ---
 
 #  Devtools
 
-```
+Add this:
+
+```tsx
 <FetchSmartDevtools />
 ```
 
 Shows:
 
-* Cache keys
-* TTL status
-* Memory + IndexedDB contents
-* SWR refreshes
-* Prefetch events
+✔ Cache keys
+✔ TTL state
+✔ Memory + IndexedDB contents
+✔ In-flight dedupe keys
+✔ Background prefetch queue
+✔ SWR refresh events
 
-Auto-disabled in production builds.
+Automatically disabled in production.
 
 ---
 
-# 🛠 Architecture (Full Diagram)
+#  Architecture Diagram
 
 ```
           ┌────────────────────────┐
           │  FetchSmartProvider    │
-          │ (axios, refresh, retry)│
+          │ (axios, retry, refresh)│
           └─────────────┬──────────┘
                         │
                         ▼
@@ -250,31 +263,49 @@ Auto-disabled in production builds.
  Cache lookup      In-flight dedupe    Abort stale req
       │                 │                  │
       ▼                 ▼                  ▼
-   Hit? → return     Shared Promise    Race-condition safe
-      │                 │                  │
-      ▼                 ▼                  ▼
-        ┌────────────────────────────────┐
-        │      Axios + Retry Logic       │
-        └────────────────────────────────┘
-                        │
-                        ▼
-              Schema validation (optional)
-                        │
-                        ▼
-                 Cache write (TTL/persist)
-                        │
-                        ▼
-               Predictive prefetch engine
+  Cache hit → return instantly
+      │
+      ▼
+   Axios fetch (with retry + refresh)
+      │
+      ▼
+ Schema validation → Cache write
+      │
+      ▼
+ Predictive prefetch engine
+```
+
+---
+```
+
+Docs include:
+
+* Intro
+* Installation
+* useGetSmart
+* Mutations
+* SWR mode
+* Cache system
+* Prefetch engine
+* Devtools
+* API Reference
+
+Start docs locally:
+
+```bash
+cd website
+npm install
+npm run start
 ```
 
 ---
 
-#  Examples Included
+#  Examples
 
 ```
 examples/
   backend/   Express mock API
-  frontend/  Vite React example app
+  frontend/  Vite React example
 ```
 
 Run:
@@ -286,24 +317,27 @@ cd ../frontend && npm install && npm run dev
 
 ---
 
-#  Publishing & Release Guide
+#  Publishing
 
-* Only compiled files from `dist/` are published
-* Type declarations included
-* `.npmignore` strips examples, source, configs
+Only `/dist` is published.
 
-Preview publish:
+Preview:
 
 ```bash
 npm pack --dry-run
 ```
 
+Includes:
+
+* ES module build
+* CJS build
+* TypeScript declarations
+
 ---
 
 #  Changelog
 
-Full history in:
- **`CHANGELOG.md`**
+Check **CHANGELOG.md** for version history.
 
 ---
 
@@ -312,18 +346,21 @@ Full history in:
 PRs welcome.
 Issues welcome.
 Feature ideas welcome.
-
-If you build something with this — tag the repo! 
+If you build something with this, tag the repo!
 
 ---
 
-#  Like the project?
+#  Support the project
 
-If this saves you time, consider:
+If this library helped you, consider:
 
-*  starring the repo
-*  sharing on X / LinkedIn
-*  using it in your next project
+* starring the repo
+* sharing on LinkedIn / X
+* using it in your next project
+
+---
+
+# 🎉 Happy Fetching!
 
 ---
  

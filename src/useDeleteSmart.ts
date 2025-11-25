@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useFetchSmartContext } from "./FetchSmartProvider";
 import { SchemaMode, SchemaValidator } from "./types";
 import { validateWithSchema } from "./utils/validateWithSchema";
-
+import { inFlightMutations, mutationKey } from "./utils/smartDedupe";
 
 export function useDeleteSmart<T = any>(
     url: string,
@@ -18,24 +18,39 @@ export function useDeleteSmart<T = any>(
 
     const mutate = async () => {
         setLoading(true);
-        try {
-            const res = await api.delete<T>(url);
-            const validated = validateWithSchema(
-                res.data,
-                opts?.schema,
-                opts?.schemaMode ?? "error",
-                url
-            );
+        setError(null);
 
+        const key = mutationKey("DELETE", url);
+
+
+        if (inFlightMutations.has(key)) {
+            return await inFlightMutations.get(key);
+        }
+
+        const promise = api.delete<T>(url);
+        inFlightMutations.set(key, promise);
+
+        try {
+            const res = await promise;
+
+            if (inFlightMutations.get(key) === promise) {
+                inFlightMutations.delete(key);
+            }
+
+            const validated = validateWithSchema(res.data, opts?.schema, "error", url);
             setData(validated);
             return validated;
+
         } catch (err) {
+            inFlightMutations.delete(key);
             setError(err);
             return null;
+
         } finally {
             setLoading(false);
         }
     };
+
 
     return { mutate, data, loading, error };
 }

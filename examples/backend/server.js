@@ -34,9 +34,7 @@ function generateRefreshToken(user) {
     return token;
 }
 
-// ---------------------------
-//         LOGIN
-// ---------------------------
+
 
 const WINDOW = 60 * 60; // seconds
 const LIMIT = 1;
@@ -48,10 +46,10 @@ async function rateLimiter(req, res, next) {
 
     const slotStart = now - WINDOW * 1000;
 
-    console.log(slotStart);
+
 
     const entry = store.get(ip);
-    console.log(store);
+
 
 
     if (!entry) {
@@ -66,7 +64,6 @@ async function rateLimiter(req, res, next) {
     }
 
     entry.count++;
-    console.log(entry.count > LIMIT);
 
 
     if (entry.count > LIMIT) {
@@ -96,14 +93,13 @@ async function slidingWIndowRateLimiter(req, res, next) {
 }
 
 
-app.get("/users", rateLimiter, async (req, res) => {
+app.get("/users", async (req, res) => {
 
     res.json(users);
 });
 
 
 app.get("/prefetchNext", async (req, res) => {
-    console.log("prefetchNext from server");
 
 
     // res.json([
@@ -181,7 +177,8 @@ function authMiddleware(req, res, next) {
 // ---------------------------
 //         PROTECTED
 // ---------------------------
-app.get("/protected", authMiddleware, (req, res) => {
+app.get("/protected", authMiddleware, async (req, res) => {
+
     res.json({
         message: "Protected route accessed",
         user: req.user
@@ -190,14 +187,16 @@ app.get("/protected", authMiddleware, (req, res) => {
 
 
 
-app.post("/users", (req, res) => {
+app.post("/users", async (req, res) => {
+
     const { name, email } = req.body;
     const newUser = { id: Date.now(), name, email };
     users.push(newUser);
     res.status(201).json(newUser);
 });
 
-app.put("/users/:id", (req, res) => {
+app.put("/users/:id", async (req, res) => {
+
     const { id } = req.params;
     const { name, email } = req.body;
     const userIndex = users.findIndex(u => u.id === parseInt(id));
@@ -208,7 +207,8 @@ app.put("/users/:id", (req, res) => {
     res.json(users[userIndex]);
 });
 
-app.delete("/users/:id", (req, res) => {
+app.delete("/users/:id", async (req, res) => {
+
     const { id } = req.params;
     const userIndex = users.findIndex(u => u.id === parseInt(id));
     if (userIndex === -1) {

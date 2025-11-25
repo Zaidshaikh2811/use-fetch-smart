@@ -16,9 +16,10 @@
     }
   },
 
-  "files": ["dist"],
-  "readme": "README.npm.md",
+  "files": ["dist", "npm-readme/README.md"
+  ],
 
+  "readme": "npm-readme/README.md",
   "scripts": {
     "build": "tsup",
     "prepublishOnly": "npm run build"

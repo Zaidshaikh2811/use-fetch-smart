@@ -1,4 +1,4 @@
-import { get, set, del, keys } from "idb-keyval";
+import { get, set, del, keys, clear } from "idb-keyval";
 
 export interface CacheItem<T> {
     data: T;
@@ -75,5 +75,12 @@ export const indexedDBCache = {
             if (isDev) console.error("IndexedDB dump error", err);
             return [];
         }
-    }
+    },
+    clear: async () => {
+        try {
+            await clear();
+        } catch (err) {
+            if (isDev) console.error("IndexedDB clear error", err);
+        }
+    },
 };

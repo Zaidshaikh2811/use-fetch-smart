@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useFetchSmartContext } from "./FetchSmartProvider";
 import { SchemaMode, SchemaValidator } from "./types";
 import { validateWithSchema } from "./utils/validateWithSchema";
+import { inFlightMutations, mutationKey } from "./utils/smartDedupe";
 
 export function usePostSmart<T = any, Body = any>(
     url: string,
@@ -18,23 +19,38 @@ export function usePostSmart<T = any, Body = any>(
     const mutate = async (body: Body) => {
         setLoading(true);
         setError(null);
-        try {
-            const res = await api.post<T>(url, body);
-            const validated = validateWithSchema(
-                res.data,
-                opts?.schema,
-                opts?.schemaMode ?? "error",
-                url
-            );
 
+
+        const key = mutationKey("POST", url, body);
+
+        if (inFlightMutations.has(key)) {
+            return await inFlightMutations.get(key);
+        }
+        const promise = api.post<T>(url, body);
+
+
+        inFlightMutations.set(key, promise);
+
+        try {
+            const res = await promise;
+
+            if (inFlightMutations.get(key) === promise) {
+                inFlightMutations.delete(key);
+            }
+
+            const validated = validateWithSchema(res.data, opts?.schema, "error", url);
             setData(validated);
             return validated;
+
         } catch (err) {
+            inFlightMutations.delete(key);
             setError(err);
             return null;
+
         } finally {
             setLoading(false);
         }
+
     };
 
     return { mutate, data, loading, error };
