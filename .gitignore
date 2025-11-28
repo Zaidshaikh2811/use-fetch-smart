@@ -5,3 +5,6 @@ dist
 .npm-debug.log
 README.npm.md
 coverage
+npm-readme/
+npm-readme/README.md
+docs/

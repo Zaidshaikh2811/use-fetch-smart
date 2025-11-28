@@ -1,7 +1,18 @@
 import { usePutSmart } from "use-fetch-smart";
 
+import { z } from "zod";
+
+const updateUserSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    email: z.string().email(),
+}).strict();
+
+
 export default function UpdateUser({ userId, onUpdated }) {
-    const { mutate, loading } = usePutSmart(`/users/${userId}`);
+    const { mutate, loading } = usePutSmart(`/users/${userId}`, {
+        schema: updateUserSchema,
+    });
 
     const handleUpdate = () => {
         mutate({ name: "Updated Name" }).then(() => {

@@ -1,46 +1,54 @@
-## 🚀 use-fetch-smart
+<h1 align="center">use-fetch-smart</h1>
+<p align="center">Smart, cached, resilient, TypeScript-first data fetching for React</p>
 
-A smart React data-fetching library with caching, TTL, retries, token auto-refresh, and simple mutation hooks — designed to reduce boilerplate and make fetch-based code reliable and easy to maintain.
-
-[![npm version](https://img.shields.io/npm/v/use-fetch-smart.svg)](https://www.npmjs.com/package/use-fetch-smart) [![license](https://img.shields.io/npm/l/use-fetch-smart.svg)]()
-
----
-
-## Why use-fetch-smart?
-
-- Single provider (`FetchSmartProvider`) to configure `baseURL`, token handling, retry limits and refresh logic.
-- Hooks for GET and mutations (`useGetSmart`, `usePostSmart`, `usePutSmart`, `useDeleteSmart`).
-- Layered cache (in-memory + optional IndexedDB persistence via `idb-keyval`).
-- Automatic token refresh on 401 and request replay.
-- Exponential backoff retry for transient errors.
-- Small, focused API and TypeScript support.
-
----
-
----
-
-## 🎥 Demo Preview
-
-A quick look at how **use-fetch-smart** behaves in real apps:
-
-### 🔄 Auto Fetch + Loading State
 <p align="center">
-<img src="./assets/Untitled design (2).gif" width="500" />
+  <img width="380" src="https://dummyimage.com/600x200/1a1a1a/ffffff&text=use-fetch-smart" />
 </p>
 
-### ⚡ Instant Response From Cache
 <p align="center">
-<img src="./assets/Untitled design (1).gif" width="500" />
+  <img src="https://img.shields.io/npm/v/use-fetch-smart?style=flat-square&color=blue" />
+  <img src="https://img.shields.io/npm/dm/use-fetch-smart?style=flat-square" />
+  <img src="https://img.shields.io/bundlephobia/minzip/use-fetch-smart?style=flat-square&label=bundle+size" />
+  <img src="https://img.shields.io/codecov/c/github/Zaidshaikh2811/use-fetch-smart?style=flat-square" />
+  <img src="https://img.shields.io/github/stars/Zaidshaikh2811/use-fetch-smart?style=flat-square" />
+  <img src="https://img.shields.io/github/license/Zaidshaikh2811/use-fetch-smart?style=flat-square" />
 </p>
 
 
-### 🔁 Retry Logic in Action
-<p align="center">
-<img src="./assets/Untitled design.gif" width="500" />
-</p>
 ---
 
-## Installation
+##  NPM Description
+
+**Smart data fetching for React with memory + IndexedDB caching, SWR, retries, token refresh, schema validation, predictive prefetching, and built-in DevTools.**
+
+---
+
+##  Overview
+
+**use-fetch-smart** is a powerful data-fetching library for React engineered for real-world apps.  
+It provides:
+
+- Smart caching (memory + IndexedDB)
+- SWR (stale-while-revalidate) support
+- Request deduplication
+- Automatic retry & exponential backoff
+- Full mutation support (POST, PUT, DELETE)
+- Token auto-refresh & request replay
+- Predictive prefetching engine
+- Schema validation (Zod / Yup / Valibot / custom)
+- Built-in Developer Tools
+
+---
+
+## Quick Start
+
+```ts
+const { data, loading, error } = useGetSmart("/users");
+````
+
+---
+
+##  Installation
 
 ```bash
 npm install use-fetch-smart
@@ -50,27 +58,30 @@ yarn add use-fetch-smart
 
 ---
 
-## Quick Start
+##  Setup
 
-Wrap your app with the `FetchSmartProvider` and provide a `refreshToken` function to enable automatic token refresh. Note: `FetchSmartDevtools` is intended for development use only — it is automatically gated out in production builds.
+Wrap your app with the provider:
 
 ```tsx
-import React from 'react';
-import { FetchSmartProvider, FetchSmartDevtools } from 'use-fetch-smart';
+import { FetchSmartProvider, FetchSmartDevtools } from "use-fetch-smart";
 
 const refreshToken = async () => {
-  const res = await fetch('/auth/refresh');
+  const res = await fetch("/auth/refresh");
   if (!res.ok) return null;
-  const json = await res.json();
-  return json.token;
+  return (await res.json()).token;
 };
 
-export default function AppRoot() {
+export default function Root() {
   return (
-    <FetchSmartProvider config={{ baseURL: 'http://localhost:4000', retryLimit: 3, refreshToken }}>
+    <FetchSmartProvider
+      config={{
+        baseURL: "http://localhost:4000",
+        retryLimit: 3,
+        refreshToken,
+      }}
+    >
       <App />
-      {/* Devtools will render only in non-production builds */}
-      <FetchSmartDevtools />
+      <FetchSmartDevtools /> {/* Optional in dev */}
     </FetchSmartProvider>
   );
 }
@@ -78,104 +89,163 @@ export default function AppRoot() {
 
 ---
 
-## Core Hooks
+## Basic Usage
 
-- `useGetSmart<T>(url, { cacheTimeMs?, persist?, swr? })` — returns `{ data, loading, error, refetch }`. Supports optional SWR-style background revalidation when `swr: true`.
-- `usePostSmart<T, B>(url)` — returns `{ mutate, data, loading, error }`.
-- `usePutSmart<T, B>(url)` — same shape as POST.
-- `useDeleteSmart<T>(url)` — returns `{ mutate, data, loading, error }`.
+### GET Request
 
-Examples are available in the `examples/` folder — see `examples/README.md`.
+```ts
+const { data, loading, error } = useGetSmart("/users", {
+  cacheTimeMs: 60000,
+  swr: true,
+});
+```
+
+### POST Request
+
+```ts
+const { mutate } = usePostSmart("/login");
+mutate({ email, password });
+```
+
+### PUT / DELETE
+
+```ts
+usePutSmart("/update-user");
+useDeleteSmart("/remove-user");
+```
 
 ---
 
-## Cache & Persistence
+##  Predictive Prefetching
 
-The library uses a layered cache internally:
+```ts
+useGetSmart("/products?page=1", {
+  prefetchNext: (data) => [
+    { url: `/products?page=${data.nextPage}` },
+    { url: `/products/summary`, ttlMs: 5000 },
+  ],
+});
+```
 
-- `memoryCache` — in-memory store for fast reads.
-- `indexedDBCache` — persistent storage via `idb-keyval` (used when `persist: true` is set on an entry).
-- `cacheDriver` — internal unified API used by the hooks to read/write caches. (Advanced users can inspect `src/cache` files.)
+---
 
-Use `cacheTimeMs` (TTL in ms) and `persist` to control storage and lifetime. If IndexedDB is unavailable the driver falls back to memory.
+## Schema Validation
 
-Example:
+```ts
+import { UserSchema } from "./schemas";
+
+const { data } = useGetSmart("/profile", {
+  schema: UserSchema,
+  schemaMode: "error",
+});
+```
+
+Supports: **Zod, Yup, Valibot, custom validators**.
+
+---
+
+##  API Reference
+
+| Hook                 | Method    | Purpose                          |
+| -------------------- | --------- | -------------------------------- |
+| `useGetSmart`        | GET       | Fetch with cache, SWR, dedupe    |
+| `usePostSmart`       | POST      | Mutations                        |
+| `usePutSmart`        | PUT       | Mutations                        |
+| `useDeleteSmart`     | DELETE    | Mutations                        |
+| `useSmart`           | Any       | Low-level full control           |
+| `FetchSmartProvider` | Provider  | Global config                    |
+| `FetchSmartDevtools` | Component | Inspect cache, TTL, dedupe state |
+
+---
+
+##  How it Works
+
+1. Checks **memory cache**
+2. If expired → checks **IndexedDB**
+3. If miss → HTTP request with retry + dedupe
+4. Validates schema
+5. Updates caches
+6. Triggers SWR or prefetch (if enabled)
+
+---
+
+##  Comparison
+
+| Feature                      | use-fetch-smart | SWR       | TanStack Query |
+| ---------------------------- | --------------- | --------- | -------------- |
+| Token auto-refresh           | ✅               | ❌         | ❌              |
+| Request replay after refresh | ✅               | ❌         | ❌              |
+| IndexedDB cache              | ✅               | ❌         | ⚠️ Plugin      |
+| Predictive prefetching       | ✅               | ❌         | ❌              |
+| Schema validation            | ✅               | ⚠️ Plugin | ⚠️ Plugin      |
+| Built-in devtools            | ✅               | ⚠️        | ⚠️             |
+| Boilerplate required         | Minimal         | Medium    | High           |
+
+---
+
+##  Error Handling
 
 ```tsx
-useGetSmart('/settings', { cacheTimeMs: 10 * 60_000, persist: true, swr: true });
+const { error, retry } = useGetSmart("/data", { retryLimit: 3 });
+
+if (error)
+  return (
+    <>
+      <p>Failed to load data.</p>
+      <button onClick={retry}>Retry</button>
+    </>
+  );
+```
+
+##  Devtools
+
+```tsx
+<FetchSmartDevtools />
+```
+
+Shows:
+
+* cache entries
+* TTL timers
+* request dedupe keys
+* prefetch queue
+* SWR events
+
+---
+
+##  Folder Structure
+
+```
+/src
+  /core
+  /hooks
+  /cache
+  /utils
+  /schemas
+/examples
 ```
 
 ---
 
-## Devtools
+##  Example Project Included
 
-`<FetchSmartDevtools />` helps inspect cached keys & values, TTLs, and the combined view of memory + IndexedDB. It is safe to include in your app during development; the component intentionally does not render in production builds.
-
----
-
-## Examples (run locally)
-
-The repo includes runnable examples (Express backend + Vite React frontend).
-
-Backend (Express): `examples/backend` — simple `/users` CRUD API.
-
-Frontend (Vite): `examples/frontend` — demonstrates provider setup and hooks usage.
-
-Run the examples:
-
-```powershell
-# Backend
-cd examples/backend
-npm install
-node server.js
-
-# Frontend
-cd examples/frontend
-npm install
-npm run dev
+```bash
+cd examples/backend && npm install && node server.js  
+cd ../frontend && npm install && npm run dev  
 ```
 
 ---
 
-## Best Practices & Notes
+##  Contributing
 
-- Tune `cacheTimeMs` per endpoint: short TTLs for frequently changing lists, longer TTLs for stable data.
-- Use `persist: true` only when you need persistence across sessions (e.g., user preferences).
-- After mutations, call `refetch()` on relevant queries or clear entries from the cache by inspecting `src/cache` utilities.
-- Keep `retryLimit` low for mutation endpoints to avoid duplicate side effects; prefer server idempotency.
+Pull requests and suggestions are welcome!
 
-Security:
-- Prefer httpOnly cookies for tokens when possible. If using tokens in client code, handle them securely.
+ If you like this package, please star the repo — it helps a lot.
 
 ---
 
-## API Reference (short)
+##  License
 
-- `FetchSmartProvider(config: { baseURL, token?, retryLimit?, refreshToken? })`
-- `useGetSmart<T>(url, { cacheTimeMs?, persist?, swr? })`
-- `usePostSmart<T, B>(url)`
-- `usePutSmart<T, B>(url)`
-- `useDeleteSmart<T>(url)`
-- `FetchSmartDevtools()` — development-only UI (gated in production)
-- `setGlobalToken(token)` — set token globally (via exported helper)
+MIT License © 2025 Zaid Shaikh
 
----
-
-## Contributing
-
-Contributions welcome — open issues or PRs. Please follow standard GitHub workflow: fork, branch, test, PR.
-
----
-
-## Changelog
-
-See `CHANGELOG.md` for release history.
-
----
-
-## License
-
-MIT © 2025
-
----
- 
+```

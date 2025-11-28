@@ -5,9 +5,47 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.1.0] - 2025-11-28
+### Added
+- Schema validation support across hooks and prefetch flow (runtime validation via `validateWithSchema`). Specifically:
+  - `usePostSmart`, `usePutSmart`, and `useDeleteSmart` now validate mutation responses when a schema is provided.
+  - `useGetSmart` and the `prefetchSmart` helper validate GET responses when `schema`/`schemaMode` options are supplied.
+  - Exported `validateWithSchema` helper (and formatted validation errors via `formatSchemaError`) for advanced usage and clearer error messages.
+- `prefetchSmart` utility: background prefetch helper used by `useGetSmart`'s `prefetchNext` option.
+
+### Changed
+- `useGetSmart` now supports an optional `prefetchNext` callback which can return predicted URLs to prefetch after a successful fetch.
+- Schema validation behavior: hooks accept a `schemaMode` option (default: `error`) —
+  - `error` (default): validation failures throw with a formatted message.
+  - `warn`: validation failures are logged as warnings and the raw data is returned.
+
+### Fixed
+- Export surface: explicitly re-exported runtime utilities so `cacheDriver`, `memoryCache`, and `indexedDBCache` are available from the package entrypoint (resolved duplicate type re-export collisions).
+- Examples: fixed frontend `LoginButton` example (JSX/login flow) and updated example docs so the Vite frontend works with `FetchSmartProvider`.
+- Removed noisy debug logging across runtime modules (notably `useGetSmart` and `cache/cacheDriver`).
+- Gated IndexedDB logging so storage errors are only printed in non-production builds (`src/cache/indexedDBCache.ts`).
+- Gated `FetchSmartDevtools` to avoid rendering in production and to prevent leaking internals (`src/FetchSmartDevtools.tsx`).
+
+### Prefetch Improvements
+- `prefetchSmart` implements:
+  - Throttling to avoid excessive requests (`PREFETCH_THROTTLE_MS`).
+  - Concurrency-limited scheduling (`MAX_PREFETCH_CONCURRENCY`) to prevent overwhelming the network.
+  - Skips prefetch when offline or on very slow network connections (uses `navigator.connection.effectiveType`).
+  - Avoids duplicated in-flight prefetches and checks cache (`cacheDriver.get`) before requesting.
+  - Saves validated responses into the cache (honoring `ttlMs` and `persist`).
+  - `cancelAllPrefetches()` helper to abort outstanding prefetches.
+
+### Packaging & Docs
+- Improved packaging metadata and npm-readme: added `README.npm.md`, updated `README.github.md`, and tuned `package.json` `files` to publish `dist/` only.
+- Added `.npmignore` rules to avoid shipping source, examples, editor configs, and lockfiles with the published package.
+
+### Notes
+- The library's built package version in `package.json` is `1.0.13` (run `npm version` to align the package.json version with the changelog/release tag if you intend to publish this as `1.1.0`).
+
+---
+
 ## [1.0.12-13] - 2025-11-15
 ### Updated Readme For better clarity and working  of Npm package
-
 
 ## [1.0.11] - 2025-11-15
 ### Added
