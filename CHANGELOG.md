@@ -5,7 +5,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [1.1.0] - 2025-11-19
+## [1.1.0] - 2025-11-28
 ### Added
 - Schema validation support across hooks and prefetch flow (runtime validation via `validateWithSchema`). Specifically:
   - `usePostSmart`, `usePutSmart`, and `useDeleteSmart` now validate mutation responses when a schema is provided.
