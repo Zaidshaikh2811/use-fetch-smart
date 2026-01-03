@@ -1,66 +1,64 @@
-<h1 align="center">use-fetch-smart</h1>
-<p align="center">Smart, cached, resilient, TypeScript-first data fetching for React</p>
+# **use-fetch-smart**
 
-<p align="center">
-  <img width="380" src="https://dummyimage.com/600x200/1a1a1a/ffffff&text=use-fetch-smart" />
-</p>
+> A lightweight, TypeScript-first React data-fetching layer with **caching**, **TTL**, **SWR**, **predictive prefetching**, **schema validation**, **automatic token refresh**, **retry logic**, and **in-flight request dedupe** — powered by an elegant, minimal API.
 
-<p align="center">
-  <img src="https://img.shields.io/npm/v/use-fetch-smart?style=flat-square&color=blue" />
-  <img src="https://img.shields.io/npm/dm/use-fetch-smart?style=flat-square" />
-  <img src="https://img.shields.io/bundlephobia/minzip/use-fetch-smart?style=flat-square&label=bundle+size" />
-  <img src="https://img.shields.io/codecov/c/github/Zaidshaikh2811/use-fetch-smart?style=flat-square" />
-  <img src="https://img.shields.io/github/stars/Zaidshaikh2811/use-fetch-smart?style=flat-square" />
-  <img src="https://img.shields.io/github/license/Zaidshaikh2811/use-fetch-smart?style=flat-square" />
-</p>
-
+![npm](https://img.shields.io/npm/v/use-fetch-smart)
+![downloads](https://img.shields.io/npm/dm/use-fetch-smart)
+![size](https://img.shields.io/bundlephobia/minzip/use-fetch-smart?label=gzip)
+![types](https://img.shields.io/npm/types/use-fetch-smart)
+![license](https://img.shields.io/npm/l/use-fetch-smart)
 
 ---
 
-##  NPM Description
+#  Why choose **use-fetch-smart**?
 
-**Smart data fetching for React with memory + IndexedDB caching, SWR, retries, token refresh, schema validation, predictive prefetching, and built-in DevTools.**
+Most data-fetching libraries are:
 
----
+- ❌ **Too heavy** — React Query ≈ 60kb  
+- ❌ **Too complex** — SWR + many plugins  
+- ❌ **Too limited** — simple wrappers, no caching
 
-##  Overview
+### **use-fetch-smart = React Query power → SWR simplicity → Axios reliability**
 
-**use-fetch-smart** is a powerful data-fetching library for React engineered for real-world apps.  
-It provides:
+| Feature                                | Included   |
+| -------------------------------------- | ---------- |
+| SWR (stale-while-revalidate)           | ✅          |
+| Memory cache                           | ✅          |
+| IndexedDB persistence                  | ✅          |
+| In-flight GET/POST/PUT/DELETE dedupe   | ✅          |
+| Retry with exponential backoff         | ✅          |
+| Automatic token refresh                | ✅          |
+| Schema validation (Zod/Yup/Valibot)    | ✅          |
+| Predictive prefetch engine             | **🔥 YES** |
+| Background concurrency queue           | **🔥 YES** |
+| AbortController support                | ✅          |
+| Devtools for cache inspection          | ✅          |
 
-- Smart caching (memory + IndexedDB)
-- SWR (stale-while-revalidate) support
-- Request deduplication
-- Automatic retry & exponential backoff
-- Full mutation support (POST, PUT, DELETE)
-- Token auto-refresh & request replay
-- Predictive prefetching engine
-- Schema validation (Zod / Yup / Valibot / custom)
-- Built-in Developer Tools
-
----
-
-## Quick Start
-
-```ts
-const { data, loading, error } = useGetSmart("/users");
-````
+Perfect for **dashboards**, **admin panels**, **SaaS apps**, **CRMs**, apps with **frequent API fetches**, and everything needing performance & reliability.
 
 ---
 
-##  Installation
+#  Install
 
 ```bash
 npm install use-fetch-smart
 # or
 yarn add use-fetch-smart
-```
+````
+
+**Peer dependencies:**
+
+* `react >= 17`
+* `react-dom >= 17`
+
+**Internal utilities:**
+
+* `axios`
+* `idb-keyval` (only when persistence is enabled)
 
 ---
 
-##  Setup
-
-Wrap your app with the provider:
+#  Quick Setup
 
 ```tsx
 import { FetchSmartProvider, FetchSmartDevtools } from "use-fetch-smart";
@@ -81,7 +79,7 @@ export default function Root() {
       }}
     >
       <App />
-      <FetchSmartDevtools /> {/* Optional in dev */}
+      <FetchSmartDevtools /> {/* Devtools enabled only in development */}
     </FetchSmartProvider>
   );
 }
@@ -89,115 +87,129 @@ export default function Root() {
 
 ---
 
-## Basic Usage
+#  Basic GET Example
 
-### GET Request
-
-```ts
+```tsx
 const { data, loading, error } = useGetSmart("/users", {
-  cacheTimeMs: 60000,
+  cacheTimeMs: 10_000,
   swr: true,
 });
 ```
 
-### POST Request
-
-```ts
-const { mutate } = usePostSmart("/login");
-mutate({ email, password });
-```
-
-### PUT / DELETE
-
-```ts
-usePutSmart("/update-user");
-useDeleteSmart("/remove-user");
-```
-
 ---
 
-##  Predictive Prefetching
+#  Predictive Prefetching (Unique Feature)
 
-```ts
+Automatically preload “future” data your user will likely need.
+
+```tsx
 useGetSmart("/products?page=1", {
   prefetchNext: (data) => [
     { url: `/products?page=${data.nextPage}` },
-    { url: `/products/summary`, ttlMs: 5000 },
+    { url: "/products/summary", ttlMs: 5000 },
   ],
 });
 ```
 
+### Prefetch Architecture
+
+```
+success → prefetchNext → queue → throttle → network check → dedupe → run
+```
+
+Prefetching never blocks UI, and never overwrites fresh cache.
+
 ---
 
-## Schema Validation
+#  Mutation Hooks
 
-```ts
-import { UserSchema } from "./schemas";
+### POST
 
-const { data } = useGetSmart("/profile", {
+```tsx
+const { mutate } = usePostSmart("/login");
+mutate({ email, password });
+```
+
+### PUT
+
+```tsx
+usePutSmart("/profile").mutate({ theme: "dark" });
+```
+
+### DELETE
+
+```tsx
+useDeleteSmart("/users/42").mutate();
+```
+
+Built-in:
+
+* schema validation
+* retry logic
+* dedupe
+* token refresh
+
+---
+
+# Schema Validation
+
+```tsx
+useGetSmart("/user", {
   schema: UserSchema,
-  schemaMode: "error",
+  schemaMode: "error", // or "warn"
 });
 ```
 
-Supports: **Zod, Yup, Valibot, custom validators**.
+Validation supports:
+
+* **Zod**
+* **Yup**
+* **Valibot**
+* Custom validators
 
 ---
 
-##  API Reference
+#  Hook API
 
-| Hook                 | Method    | Purpose                          |
-| -------------------- | --------- | -------------------------------- |
-| `useGetSmart`        | GET       | Fetch with cache, SWR, dedupe    |
-| `usePostSmart`       | POST      | Mutations                        |
-| `usePutSmart`        | PUT       | Mutations                        |
-| `useDeleteSmart`     | DELETE    | Mutations                        |
-| `useSmart`           | Any       | Low-level full control           |
-| `FetchSmartProvider` | Provider  | Global config                    |
-| `FetchSmartDevtools` | Component | Inspect cache, TTL, dedupe state |
+### `useGetSmart<T>(url, options?)`
 
----
+Returns:
 
-##  How it Works
-
-1. Checks **memory cache**
-2. If expired → checks **IndexedDB**
-3. If miss → HTTP request with retry + dedupe
-4. Validates schema
-5. Updates caches
-6. Triggers SWR or prefetch (if enabled)
-
----
-
-##  Comparison
-
-| Feature                      | use-fetch-smart | SWR       | TanStack Query |
-| ---------------------------- | --------------- | --------- | -------------- |
-| Token auto-refresh           | ✅               | ❌         | ❌              |
-| Request replay after refresh | ✅               | ❌         | ❌              |
-| IndexedDB cache              | ✅               | ❌         | ⚠️ Plugin      |
-| Predictive prefetching       | ✅               | ❌         | ❌              |
-| Schema validation            | ✅               | ⚠️ Plugin | ⚠️ Plugin      |
-| Built-in devtools            | ✅               | ⚠️        | ⚠️             |
-| Boilerplate required         | Minimal         | Medium    | High           |
-
----
-
-##  Error Handling
-
-```tsx
-const { error, retry } = useGetSmart("/data", { retryLimit: 3 });
-
-if (error)
-  return (
-    <>
-      <p>Failed to load data.</p>
-      <button onClick={retry}>Retry</button>
-    </>
-  );
+```ts
+{
+  data: T | null,
+  loading: boolean,
+  error: any,
+  refetch: () => Promise<void>
+}
 ```
 
-##  Devtools
+Options include:
+
+* `cacheTimeMs`
+* `persist`
+* `swr`
+* `schema`
+* `schemaMode`
+* `prefetchNext`
+
+---
+
+#  Cache Architecture
+
+```
+useGetSmart
+    ↓
+cacheDriver.get()
+    ├── memoryCache
+    └── indexedDBCache (if persist enabled)
+```
+
+Writes go to **memory** and **IndexedDB** (if enabled).
+
+---
+
+#  Devtools
 
 ```tsx
 <FetchSmartDevtools />
@@ -205,47 +217,116 @@ if (error)
 
 Shows:
 
-* cache entries
+* Memory cache
+* IndexedDB cache
 * TTL timers
-* request dedupe keys
-* prefetch queue
-* SWR events
+* Cache keys
+* In-flight deduped requests
+
+Automatically disabled in **production**.
 
 ---
 
-##  Folder Structure
+#  Internal Workflow
+
+### Request lifecycle
 
 ```
-/src
-  /core
-  /hooks
-  /cache
-  /utils
-  /schemas
-/examples
+read cache → SWR check → abort stale → dedupe → axios request → schema validate → cache write → prefetch queue
+```
+
+### Prefetch queue workflow
+
+```
+throttle → concurrency limit → dedupe → network check → execute
 ```
 
 ---
 
-##  Example Project Included
+# Example Projects
+
+Included in `/examples`:
+
+```
+backend/   → Express mock API
+frontend/  → Vite-based React demo
+```
+
+Run:
 
 ```bash
-cd examples/backend && npm install && node server.js  
-cd ../frontend && npm install && npm run dev  
+cd examples/backend && npm install && node server.js
+cd ../frontend && npm install && npm run dev
 ```
 
 ---
 
-##  Contributing
+#  Publishing Notes (NPM)
 
-Pull requests and suggestions are welcome!
+* Only **dist/** is published
+* TypeScript types included
+* Examples/configs excluded via `.npmignore`
+* Validate before publishing:
 
- If you like this package, please star the repo — it helps a lot.
+```bash
+npm pack --dry-run
+```
 
 ---
 
-##  License
+#  Troubleshooting
 
-MIT License © 2025 Zaid Shaikh
+### Data not updating?
+
+Enable SWR:
+
+```ts
+swr: true
+```
+
+### Too many validation errors?
+
+Use warn mode:
+
+```ts
+schemaMode: "warn"
+```
+
+---
+
+#  Contributing
+
+PRs, issues, and feature requests are welcome!
+
+If you like this package, please ⭐ the repo — it helps a lot ❤️
+
+---
+
+#  SEO Keywords (for NPM & GitHub)
 
 ```
+react fetch
+react query alternative
+swr alternative
+react axios hook
+react caching hook
+react ttl cache
+predictive prefetch
+react hooks api
+axios wrapper react
+react data fetching library
+token refresh react
+react retry fetch
+abortcontroller react hook
+idb indexeddb cache react
+typescript fetch hooks
+```
+
+---
+
+#  License
+
+MIT © 2025 — **use-fetch-smart**
+
+```
+
